@@ -1,6 +1,6 @@
 {
   "name": "ngwa",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "NGWA POC",
   "main": "index.js",
   "scripts": {
