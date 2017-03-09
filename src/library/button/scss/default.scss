@@ -1,5 +1,17 @@
+//
+// Core variables and mixins
+//
+@import "./src/globals/scss/variables";
+@import "./src/globals/scss/mixins";
+
+//
+// Base files
+//
+@import "./src/globals/scss/fonts";
+@import "./src/globals/scss/base";
+
 .button {
-  background-color: #aaa;
+  background-color: red;
   font-size: 16px;
 }
 
