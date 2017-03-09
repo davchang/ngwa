@@ -1,0 +1,2955 @@
+// Variables
+//
+// Copy settings from this file into the provided `_custom.scss` to override
+// the Bootstrap defaults without modifying key, versioned files.
+
+
+// Table of Contents
+//
+// Colors
+// Options
+// Spacing
+// Body
+// Links
+// Grid breakpoints
+// Grid containers
+// Grid columns
+// Fonts
+// Components
+// Tables
+// Buttons
+// Forms
+// Dropdowns
+// Z-index master list
+// Navbar
+// Navs
+// Pagination
+// Jumbotron
+// Form states and alerts
+// Cards
+// Tooltips
+// Popovers
+// Badges
+// Modals
+// Alerts
+// Progress bars
+// List group
+// Image thumbnails
+// Figures
+// Breadcrumbs
+// Carousel
+// Close
+// Code
+
+@mixin _assert-ascending($map, $map-name) {
+	$prev-key: null;
+	$prev-num: null;
+	@each $key, $num in $map {
+		@if $prev-num == null {
+			// Do nothing
+		} @else if not comparable($prev-num, $num) {
+			@warn "Potentially invalid value for #{$map-name}: This map must be in ascending order, but key '#{$key}' has value #{$num} whose unit makes it incomparable to #{$prev-num}, the value of the previous key '#{$prev-key}' !";
+		} @else if $prev-num >= $num {
+			@warn "Invalid value for #{$map-name}: This map must be in ascending order, but key '#{$key}' has value #{$num} which isn't greater than #{$prev-num}, the value of the previous key '#{$prev-key}' !";
+		}
+		$prev-key: $key;
+		$prev-num: $num;
+	}
+}
+
+// Replace `$search` with `$replace` in `$string`
+// @author Hugo Giraudel
+// @param {String} $string - Initial string
+// @param {String} $search - Substring to replace
+// @param {String} $replace ('') - New value
+// @return {String} - Updated string
+@function str-replace($string, $search, $replace: "") {
+	$index: str-index($string, $search);
+
+	@if $index {
+		@return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+	}
+
+	@return $string;
+}
+
+@mixin _assert-starts-at-zero($map) {
+	$values: map-values($map);
+	$first-value: nth($values, 1);
+	@if $first-value != 0 {
+		@warn "First breakpoint in `$grid-breakpoints` must start at 0, but starts at #{$first-value}.";
+	}
+}
+
+
+// General variable structure
+//
+// Variable format should follow the `$component-modifier-state-property` order.
+
+
+// Colors
+//
+// Grayscale and brand colors for use across Bootstrap.
+
+// Start with assigning color names to specific hex values.
+$white:  #fff !default;
+$black:  #000 !default;
+$red:    #d9534f !default;
+$orange: #f0ad4e !default;
+$yellow: #ffd500 !default;
+$green:  #5cb85c !default;
+$blue:   #0275d8 !default;
+$teal:   #5bc0de !default;
+$pink:   #ff5b77 !default;
+$purple: #613d7c !default;
+
+// Create grayscale
+$gray-dark:                 #292b2c !default;
+$gray:                      #464a4c !default;
+$gray-light:                #636c72 !default;
+$gray-lighter:              #eceeef !default;
+$gray-lightest:             #f7f7f9 !default;
+
+// Reassign color vars to semantic color scheme
+$brand-primary:             $blue !default;
+$brand-success:             $green !default;
+$brand-info:                $teal !default;
+$brand-warning:             $orange !default;
+$brand-danger:              $red !default;
+$brand-inverse:             $gray-dark !default;
+
+// SST Color Map
+$colors: (
+	// SST Main Color Pallete
+	true-gray: #777,	
+	sst-orange: #FF5308,
+	deep-purple: #594964,
+	dull-blue: #579,
+	poolside-green: #89A194,
+	buff-yellow: #CFC89A,
+	pumpkinhead-orange: #CC883A,
+	rust-orange: #A14016,
+	dusty-brown: #A39382,
+
+	// Other Colors
+	seventies-fridge-green: #789048,
+	montana-gold-yellow: #DB9F24,
+	smaug-red: #B32C06,
+	engineering-pad-green: #5D804D,
+	battleship-gray: #6b7578,
+	modor-black: #292423,
+	modor-gray: #504845,
+
+	// Catalog Corrosion Resistance Colors
+	medium-corrosion-teal: #008C95, // PANTONE 321 C
+	high-corrosion-burgandy: #9D2235, // PANTONE 201 C
+	severe-corrosion-blue: #71C5E8, // PANTONE 297 C
+	value-engineered-blue: #005EB8, // PANTONE 300 C	
+
+	// Catalog Material Colors
+	material-wood: #E9A459,
+	material-wood-ghosting: #FDE4CD,
+	material-wood-preservative: #B2A67C,
+	material-concrete: #F1F2F2,
+	material-brick: #FF875B,
+	material-brick-grout: #D1D3D4,
+	connector-metal-galvanized: #B8C7D3,
+	connector-metal-painted: #A7A9AC,
+	connector-metal-steel: #939598,
+	fastener-galvanized: #B8C7D3,
+	fastener-common: #B2A67C,
+	fastener-stainless: #EAEDF0,
+	fastener-titen-masonry: #4285AC,
+	fastener-double-barrier: #96785D,
+	fastener-ecoat: #939598
+);
+
+// SST Color Variations
+$variations: (
+	dark-6: (
+		function: darken,
+		parameters: 65%
+	),
+	dark-5: (
+		function: darken,
+		parameters: 55%
+	),
+	dark-4: (
+		function: darken,
+		parameters: 45%
+	),
+	dark-3: (
+		function: darken,
+		parameters: 35%
+	),
+	dark-2: (
+		function: darken,
+		parameters: 25%
+	),
+	dark-1: (
+		function: darken,
+		parameters: 15%
+	),
+	light-1: (
+		function: lighten,
+		parameters: 15%
+	),
+	light-2: (
+		function: lighten,
+		parameters: 25%
+	),
+	light-3: (
+		function: lighten,
+		parameters: 35%
+	),
+	light-4: (
+		function: lighten,
+		parameters: 45%
+	),
+	light-5: (
+		function: lighten,
+		parameters: 55%
+	),
+	light-6: (
+		function: lighten,
+		parameters: 65%
+	),
+	fade: (
+		function: rgba,
+		parameters: 0.75
+	),
+	grayscale: (
+		function: grayscale
+	),
+	shade-6: (
+		function: mix,
+		parameters: black 35%
+	),
+	shade-5: (
+		function: mix,
+		parameters: black 45%
+	),
+	shade-4: (
+		function: mix,
+		parameters: black 55%
+	),
+	shade-3: (
+		function: mix,
+		parameters: black 65%
+	),
+	shade-2: (
+		function: mix,
+		parameters: black 75%
+	),
+	shade-1: (
+		function: mix,
+		parameters: black 85%
+	),
+	tint-1: (
+		function: mix,
+		parameters: white 85%
+	),
+	tint-2: (
+		function: mix,
+		parameters: white 75%
+	),
+	tint-3: (
+		function: mix,
+		parameters: white 65%
+	),
+	tint-4: (
+		function: mix,
+		parameters: white 55%
+	),
+	tint-5: (
+		function: mix,
+		parameters: white 45%
+	),
+	tint-6: (
+		function: mix,
+		parameters: white 35%
+	),
+	saturate-2: (
+		function: saturate,
+		parameters: 25%
+	),
+	saturate-1: (
+		function: saturate,
+		parameters: 10%
+	),
+	desaturate-1: (
+		function: desaturate,
+		parameters: 10%
+	),
+	desaturate-2: (
+		function: desaturate,
+		parameters: 25%
+	)
+);
+
+// For colors
+@function color-variation($color, $variation: false) {
+	// Correctly set $color variable:
+	@if map-has-key($colors, $color) {
+		// $color is in $colors, set variable = map-value
+		$color: map-get($colors, $color); 
+	} @else {
+		@if type-of($color) != color {
+			// $color is not in $color and $color is not a color
+			@error "Invalid color name: `#{$color}`."; 
+		}
+	// $color is a valid color - use it
+	}
+
+	@if $variation {
+		@if not map-has-key($variations, $variation) {
+			// variation is not in $variations
+			@error "Invalid $variation: `#{$variation}`.";
+		} @else {
+			// make it easier to deal with nested map
+			$this-variation: map-get($variations, $variation);
+			// $args = $function, $color
+			$args: join(map-get($this-variation, function), $color);
+			@if map-get($this-variation, parameters) {
+				// $args = $function, $colors, $parameters
+				$args: join($args, map-get($this-variation, parameters));
+			}
+			//@return $args;
+			@return call($args...);
+		}
+	}
+	// no $variation, just return $color
+	@return $color;
+}
+
+// Alias function to make typing easier:
+@function cv($color, $variation:false) {
+	@return color-variation($color, $variation);
+}
+
+
+// Options
+//
+// Quickly modify global styling by enabling or disabling optional features.
+
+$enable-rounded:            true !default;
+$enable-shadows:            false !default;
+$enable-gradients:          false !default;
+$enable-transitions:        true !default;
+$enable-hover-media-query:  false !default;
+$enable-grid-classes:       true !default;
+$enable-print-styles:       true !default;
+
+
+// Spacing
+//
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+// You can add more entries to the $spacers map, should you need more variation.
+
+$spacer:   1rem !default;
+$spacer-x: $spacer !default;
+$spacer-y: $spacer !default;
+$spacers: (
+	0: (
+		x: 0,
+		y: 0
+	),
+	1: (
+		x: ($spacer-x * .25),
+		y: ($spacer-y * .25)
+	),
+	2: (
+		x: ($spacer-x * .5),
+		y: ($spacer-y * .5)
+	),
+	3: (
+		x: $spacer-x,
+		y: $spacer-y
+	),
+	4: (
+		x: ($spacer-x * 1.5),
+		y: ($spacer-y * 1.5)
+	),
+	5: (
+		x: ($spacer-x * 3),
+		y: ($spacer-y * 3)
+	)
+) !default;
+$border-width: 1px !default;
+
+// This variable affects the `.h-*` and `.w-*` classes.
+$sizes: (
+	25: 25%,
+	50: 50%,
+	75: 75%,
+	100: 100%
+) !default;
+
+// Body
+//
+// Settings for the `<body>` element.
+
+$body-bg:       $white !default;
+$body-color:    cv(true-gray,dark-2) !default;
+$inverse-bg:    $gray-dark !default;
+$inverse-color: $gray-lighter !default;
+
+
+// Links
+//
+// Style anchor elements.
+
+$link-color:            $brand-primary !default;
+$link-decoration:       none !default;
+$link-hover-color:      darken($link-color, 15%) !default;
+$link-hover-decoration: underline !default;
+
+
+// Grid breakpoints
+//
+// Define the minimum dimensions at which your layout will change,
+// adapting to different screen sizes, for use in media queries.
+
+$grid-breakpoints: (
+	xs: 0,
+	sm: 576px,
+	md: 768px,
+	lg: 1100px,
+	xl: 1500px
+) !default;
+@include _assert-ascending($grid-breakpoints, "$grid-breakpoints");
+@include _assert-starts-at-zero($grid-breakpoints);
+
+
+// Grid containers
+//
+// Define the maximum width of `.container` for different screen sizes.
+
+$container-max-widths: (
+	sm: 540px,
+	md: 720px,
+	lg: 960px,
+	xl: 1140px
+) !default;
+@include _assert-ascending($container-max-widths, "$container-max-widths");
+
+
+// Grid columns
+//
+// Set the number of columns and specify the width of the gutters.
+
+$grid-columns:               12 !default;
+$grid-gutter-width-base:     30px !default;
+$grid-gutter-widths: (
+	xs: $grid-gutter-width-base,
+	sm: $grid-gutter-width-base,
+	md: $grid-gutter-width-base,
+	lg: $grid-gutter-width-base,
+	xl: $grid-gutter-width-base
+) !default;
+
+// Fonts
+//
+// Font, line-height, and color for body text, headings, and more.
+
+$font--helvetica-2: "helvetica-2", helvetica, arial, sans-serif;
+$font--helvetica-2i: "helvetica-2i", helvetica, arial, sans-serif;
+$font--helvetica-2c: "helvetica-2c", helvetica, arial, sans-serif;
+$font--helvetica-2ci: "helvetica-2ci", helvetica, arial, sans-serif;
+$font--helvetica-2e: "helvetica-2e", helvetica, arial, sans-serif;
+$font--helvetica-2ei: "helvetica-2ei", helvetica, arial, sans-serif;
+$font--helvetica-3: "helvetica-3", helvetica, arial, sans-serif;
+$font--helvetica-3i: "helvetica-3i", helvetica, arial, sans-serif;
+$font--helvetica-3c: "helvetica-3c", helvetica, arial, sans-serif;
+$font--helvetica-3ci: "helvetica-3ci", helvetica, arial, sans-serif;
+$font--helvetica-3e: "helvetica-3e", helvetica, arial, sans-serif;
+$font--helvetica-3ei: "helvetica-3ei", helvetica, arial, sans-serif;
+$font--helvetica-4: "helvetica-4", helvetica, arial, sans-serif; 
+$font--helvetica-4i: "helvetica-4i", helvetica, arial, sans-serif;
+$font--helvetica-4c: "helvetica-4c", helvetica, arial, sans-serif;
+$font--helvetica-4ci: "helvetica-4ci", helvetica, arial, sans-serif;
+$font--helvetica-4e: "helvetica-4e", helvetica, arial, sans-serif;
+$font--helvetica-4ei: "helvetica-4ei", helvetica, arial, sans-serif;
+$font--helvetica-5: "helvetica-5", helvetica, arial, sans-serif;
+$font--helvetica-5i: "helvetica-5i", helvetica, arial, sans-serif;
+$font--helvetica-5c: "helvetica-5c", helvetica, arial, sans-serif;
+$font--helvetica-5ci: "helvetica-5ci", helvetica, arial, sans-serif;
+$font--helvetica-5e: "helvetica-5e", helvetica, arial, sans-serif;
+$font--helvetica-5ei: "helvetica-5ei", helvetica, arial, sans-serif;
+$font--helvetica-6: "helvetica-6", helvetica, arial, sans-serif;
+$font--helvetica-6i: "helvetica-6i", helvetica, arial, sans-serif;
+$font--helvetica-6c: "helvetica-6c", helvetica, arial, sans-serif;
+$font--helvetica-6ci: "helvetica-6ci", helvetica, arial, sans-serif;
+$font--helvetica-6e: "helvetica-6e", helvetica, arial, sans-serif;
+$font--helvetica-6ei: "helvetica-6ei", helvetica, arial, sans-serif;
+$font--helvetica-7: "helvetica-7", helvetica, arial, sans-serif;
+$font--helvetica-7i: "helvetica-7i", helvetica, arial, sans-serif;
+$font--helvetica-7c: "helvetica-7c", helvetica, arial, sans-serif;
+$font--helvetica-7ci: "helvetica-7ci", helvetica, arial, sans-serif;
+$font--helvetica-7e: "helvetica-7e", helvetica, arial, sans-serif;
+$font--helvetica-7ei: "helvetica-7ei", helvetica, arial, sans-serif;
+$font--helvetica-8: "helvetica-8", helvetica, arial, sans-serif;
+$font--helvetica-8i: "helvetica-8i", helvetica, arial, sans-serif;
+$font--helvetica-8c: "helvetica-8c", helvetica, arial, sans-serif;
+$font--helvetica-8ci: "helvetica-8ci", helvetica, arial, sans-serif;
+$font--helvetica-8e: "helvetica-8e", helvetica, arial, sans-serif;
+$font--helvetica-8ei: "helvetica-8ei", helvetica, arial, sans-serif;
+$font--helvetica-9: "helvetica-9", helvetica, arial, sans-serif;
+$font--helvetica-9i: "helvetica-9i", helvetica, arial, sans-serif;
+$font--helvetica-9c: "helvetica-9c", helvetica, arial, sans-serif;
+$font--helvetica-9ci: "helvetica-9ci", helvetica, arial, sans-serif;
+$font--helvetica-9e: "helvetica-9e", helvetica, arial, sans-serif;
+$font--helvetica-9ei: "helvetica-9ei", helvetica, arial, sans-serif;
+$font--helvetica-10c: "helvetica-10c", helvetica, arial, sans-serif;
+$font--helvetica-10ci: "helvetica-10ci", helvetica, arial, sans-serif;
+
+$font--serif:      Georgia, "Times New Roman", Times, serif !default;
+$font--monospace:  "Courier New", monospace !default;
+$font--base:       $font--helvetica-5 !default;
+$font--icon:	"webapp-icon";
+
+$icon--new: "\e0bb";
+$icon--newbold: "\e0bc";
+$icon--canada: "\e0bd";
+$icon--value-engineered: "\e0be";
+$icon--flag-canada-fg: "\e111";
+$icon--sst-logo-complete: "\e115";
+$icon--sd-conn-approved: "\e118";
+$icon--update: "\e11a";
+$icon--update-bold: "\e11b";
+$icon--app-solid: "\e11c";
+$icon--app-outline: "\e11d";
+$icon--squirrel: "\e11e";
+$icon--bird: "\e11f";
+$icon--thinking-man: "\e120";
+$icon--dfa-man: "\e121";
+$icon--corrosion-ss: "\e122";
+$icon--sunrise: "\e900";
+$icon--sun: "\e901";
+$icon--moon: "\e902";
+$icon--sun2: "\e903";
+$icon--windy: "\e904";
+$icon--wind: "\e905";
+$icon--snowflake: "\e906";
+$icon--cloudy: "\e907";
+$icon--cloud: "\e908";
+$icon--weather: "\e909";
+$icon--weather2: "\e90a";
+$icon--weather3: "\e90b";
+$icon--lines: "\e90c";
+$icon--cloud2: "\e90d";
+$icon--lightning: "\e90e";
+$icon--lightning2: "\e90f";
+$icon--rainy: "\e910";
+$icon--rainy2: "\e911";
+$icon--windy2: "\e912";
+$icon--windy3: "\e913";
+$icon--snowy: "\e914";
+$icon--snowy2: "\e915";
+$icon--snowy3: "\e916";
+$icon--weather4: "\e917";
+$icon--cloudy2: "\e918";
+$icon--cloud3: "\e919";
+$icon--lightning3: "\e91a";
+$icon--sun3: "\e91b";
+$icon--moon2: "\e91c";
+$icon--cloudy3: "\e91d";
+$icon--cloud4: "\e91e";
+$icon--cloud5: "\e91f";
+$icon--lightning4: "\e920";
+$icon--rainy3: "\e921";
+$icon--rainy4: "\e922";
+$icon--windy4: "\e923";
+$icon--windy5: "\e924";
+$icon--snowy4: "\e925";
+$icon--snowy5: "\e926";
+$icon--weather5: "\e927";
+$icon--cloudy4: "\e928";
+$icon--lightning5: "\e929";
+$icon--thermometer: "\e92a";
+$icon--compass: "\e92b";
+$icon--none: "\e92c";
+$icon--Celsius: "\e92d";
+$icon--Fahrenheit: "\e92e";
+$icon--type: "\e92f";
+$icon--box: "\e930";
+$icon--archive: "\e931";
+$icon--envelope: "\e932";
+$icon--email: "\e933";
+$icon--files: "\e934";
+$icon--uniE935: "\e935";
+$icon--file-settings: "\e936";
+$icon--file-add: "\e937";
+$icon--file: "\e938";
+$icon--align-left: "\e939";
+$icon--align-right: "\e93a";
+$icon--align-center: "\e93b";
+$icon--align-justify: "\e93c";
+$icon--file-broken: "\e93d";
+$icon--browser: "\e93e";
+$icon--windows: "\e93f";
+$icon--window: "\e940";
+$icon--folder: "\e941";
+$icon--folder-add: "\e942";
+$icon--folder-settings: "\e943";
+$icon--folder-check: "\e944";
+$icon--wifi-low: "\e945";
+$icon--wifi-mid: "\e946";
+$icon--wifi-full: "\e947";
+$icon--connection-empty: "\e948";
+$icon--connection-25: "\e949";
+$icon--connection-50: "\e94a";
+$icon--connection-75: "\e94b";
+$icon--connection-full: "\e94c";
+$icon--list: "\e94d";
+$icon--grid: "\e94e";
+$icon--uniE94F: "\e94f";
+$icon--battery-charging: "\e950";
+$icon--battery-empty: "\e951";
+$icon--battery-25: "\e952";
+$icon--battery-50: "\e953";
+$icon--battery-75: "\e954";
+$icon--battery-full: "\e955";
+$icon--settings: "\e956";
+$icon--arrow-left: "\e957";
+$icon--arrow-up: "\e958";
+$icon--arrow-down: "\e959";
+$icon--arrow-right: "\e95a";
+$icon--reload: "\e95b";
+$icon--refresh: "\e95c";
+$icon--volume: "\e95d";
+$icon--volume-increase: "\e95e";
+$icon--volume-decrease: "\e95f";
+$icon--mute: "\e960";
+$icon--microphone: "\e961";
+$icon--microphone-off: "\e962";
+$icon--book: "\e963";
+$icon--checkmark: "\e964";
+$icon--checkbox-checked: "\e965";
+$icon--checkbox: "\e966";
+$icon--paperclip: "\e967";
+$icon--download: "\e968";
+$icon--tag: "\e969";
+$icon--trashcan: "\e96a";
+$icon--search: "\e96b";
+$icon--zoomin: "\e96c";
+$icon--zoomout: "\e96d";
+$icon--chat: "\e96e";
+$icon--chat-1: "\e96f";
+$icon--chat-2: "\e970";
+$icon--chat-3: "\e971";
+$icon--comment: "\e972";
+$icon--calendar: "\e973";
+$icon--bookmark: "\e974";
+$icon--email2: "\e975";
+$icon--heart: "\e976";
+$icon--enter: "\e977";
+$icon--cloud6: "\e978";
+$icon--book2: "\e979";
+$icon--star: "\e97a";
+$icon--clock: "\e97b";
+$icon--printer: "\e97c";
+$icon--home: "\e97d";
+$icon--flag: "\e97e";
+$icon--meter: "\e97f";
+$icon--switch: "\e980";
+$icon--forbidden: "\e981";
+$icon--lock: "\e982";
+$icon--unlocked: "\e983";
+$icon--unlocked2: "\e984";
+$icon--users: "\e985";
+$icon--user: "\e986";
+$icon--users2: "\e987";
+$icon--user2: "\e988";
+$icon--bullhorn: "\e989";
+$icon--share: "\e98a";
+$icon--screen: "\e98b";
+$icon--phone: "\e98c";
+$icon--phone-portrait: "\e98d";
+$icon--phone-landscape: "\e98e";
+$icon--tablet: "\e98f";
+$icon--tablet-landscape: "\e990";
+$icon--laptop: "\e991";
+$icon--camera: "\e992";
+$icon--microwaveoven: "\e993";
+$icon--creditcards: "\e994";
+$icon--calculator: "\e995";
+$icon--bag: "\e996";
+$icon--diamond: "\e997";
+$icon--drink: "\e998";
+$icon--shorts: "\e999";
+$icon--vcard: "\e99a";
+$icon--sun4: "\e99b";
+$icon--bill: "\e99c";
+$icon--coffee: "\e99d";
+$icon--uniE99E: "\e99e";
+$icon--newspaper: "\e99f";
+$icon--stack: "\e9a0";
+$icon--mapmarker: "\e9a1";
+$icon--map: "\e9a2";
+$icon--support: "\e9a3";
+$icon--uniE9A4: "\e9a4";
+$icon--barbell: "\e9a5";
+$icon--stopwatch: "\e9a6";
+$icon--atom: "\e9a7";
+$icon--syringe: "\e9a8";
+$icon--health: "\e9a9";
+$icon--bolt: "\e9aa";
+$icon--pill: "\e9ab";
+$icon--bones: "\e9ac";
+$icon--lab: "\e9ad";
+$icon--clipboard: "\e9ae";
+$icon--mug: "\e9af";
+$icon--bucket: "\e9b0";
+$icon--select: "\e9b1";
+$icon--graph: "\e9b2";
+$icon--crop: "\e9b3";
+$icon--image: "\e9b4";
+$icon--cube: "\e9b5";
+$icon--bars: "\e9b6";
+$icon--chart: "\e9b7";
+$icon--pencil: "\e9b8";
+$icon--measure: "\e9b9";
+$icon--eyedropper: "\e9ba";
+$icon--warning: "\e9bb";
+$icon--cloud7: "\e9bc";
+$icon--locked: "\e9bd";
+$icon--inbox: "\e9be";
+$icon--comment2: "\e9bf";
+$icon--mic: "\e9c0";
+$icon--envelope2: "\e9c1";
+$icon--briefcase: "\e9c2";
+$icon--cart: "\e9c3";
+$icon--contrast: "\e9c4";
+$icon--clock2: "\e9c5";
+$icon--user3: "\e9c6";
+$icon--cog: "\e9c7";
+$icon--music: "\e9c8";
+$icon--twitter: "\e9c9";
+$icon--pencil2: "\e9ca";
+$icon--frame: "\e9cb";
+$icon--switch2: "\e9cc";
+$icon--star2: "\e9cd";
+$icon--key: "\e9ce";
+$icon--chart2: "\e9cf";
+$icon--apple: "\e9d0";
+$icon--file2: "\e9d1";
+$icon--plus: "\e9d2";
+$icon--minus: "\e9d3";
+$icon--picture: "\e9d4";
+$icon--folder2: "\e9d5";
+$icon--camera2: "\e9d6";
+$icon--search2: "\e9d7";
+$icon--dribbble: "\e9d8";
+$icon--forrst: "\e9d9";
+$icon--feed: "\e9da";
+$icon--blocked: "\e9db";
+$icon--target: "\e9dc";
+$icon--play: "\e9dd";
+$icon--pause: "\e9de";
+$icon--bug: "\e9df";
+$icon--console: "\e9e0";
+$icon--film: "\e9e1";
+$icon--type2: "\e9e2";
+$icon--home2: "\e9e3";
+$icon--earth: "\e9e4";
+$icon--location: "\e9e5";
+$icon--info: "\e9e6";
+$icon--eye: "\e9e7";
+$icon--heart2: "\e9e8";
+$icon--bookmark2: "\e9e9";
+$icon--wrench: "\e9ea";
+$icon--calendar2: "\e9eb";
+$icon--window2: "\e9ec";
+$icon--monitor: "\e9ed";
+$icon--mobile: "\e9ee";
+$icon--droplet: "\e9ef";
+$icon--mouse: "\e9f0";
+$icon--refresh2: "\e9f1";
+$icon--location2: "\e9f2";
+$icon--tag2: "\e9f3";
+$icon--phone2: "\e9f4";
+$icon--star3: "\e9f5";
+$icon--pointer: "\e9f6";
+$icon--thumbsup: "\e9f7";
+$icon--thumbsdown: "\e9f8";
+$icon--headphones: "\e9f9";
+$icon--move: "\e9fa";
+$icon--checkmark2: "\e9fb";
+$icon--cancel: "\e9fc";
+$icon--skype: "\e9fd";
+$icon--gift: "\e9fe";
+$icon--cone: "\e9ff";
+$icon--alarm: "\ea00";
+$icon--coffee2: "\ea01";
+$icon--basket: "\ea02";
+$icon--flag2: "\ea03";
+$icon--ipod: "\ea04";
+$icon--trashcan2: "\ea05";
+$icon--bolt2: "\ea06";
+$icon--ampersand: "\ea07";
+$icon--compass2: "\ea08";
+$icon--list2: "\ea09";
+$icon--grid2: "\ea0a";
+$icon--volume2: "\ea0b";
+$icon--volume3: "\ea0c";
+$icon--stats: "\ea0d";
+$icon--target2: "\ea0e";
+$icon--forward: "\ea0f";
+$icon--paperclip2: "\ea10";
+$icon--keyboard: "\ea11";
+$icon--crop2: "\ea12";
+$icon--floppy: "\ea13";
+$icon--filter: "\ea14";
+$icon--trophy: "\ea15";
+$icon--diary: "\ea16";
+$icon--addressbook: "\ea17";
+$icon--stop: "\ea18";
+$icon--smiley: "\ea19";
+$icon--shit: "\ea1a";
+$icon--bookmark3: "\ea1b";
+$icon--camera3: "\ea1c";
+$icon--lamp: "\ea1d";
+$icon--disk: "\ea1e";
+$icon--button: "\ea1f";
+$icon--database: "\ea20";
+$icon--creditcard: "\ea21";
+$icon--atom2: "\ea22";
+$icon--winsows: "\ea23";
+$icon--target3: "\ea24";
+$icon--battery: "\ea25";
+$icon--code: "\ea26";
+$icon--alert: "\f02d";
+$icon--alignment-align: "\f08a";
+$icon--alignment-aligned-to: "\f08e";
+$icon--alignment-unalign: "\f08b";
+$icon--arrow-down2: "\f03f";
+$icon--arrow-left2: "\f040";
+$icon--arrow-right2: "\f03e";
+$icon--arrow-small-down: "\f0a0";
+$icon--arrow-small-left: "\f0a1";
+$icon--arrow-small-right: "\f071";
+$icon--arrow-small-up: "\f09f";
+$icon--arrow-up2: "\f03d";
+$icon--beer: "\f069";
+$icon--book3: "\f007";
+$icon--bookmark4: "\f07b";
+$icon--briefcase2: "\f0d3";
+$icon--broadcast: "\f048";
+$icon--browser2: "\f0c5";
+$icon--bug2: "\f091";
+$icon--calendar3: "\f068";
+$icon--check: "\f03a";
+$icon--checklist: "\f076";
+$icon--chevron-down: "\f0a3";
+$icon--chevron-left: "\f0a4";
+$icon--chevron-right: "\f078";
+$icon--chevron-up: "\f0a2";
+$icon--circle-slash: "\f084";
+$icon--circuit-board: "\f0d6";
+$icon--clippy: "\f035";
+$icon--clock3: "\f046";
+$icon--cloud-download: "\f00b";
+$icon--cloud-upload: "\f00c";
+$icon--code2: "\f05f";
+$icon--color-mode: "\f065";
+$icon--comment3: "\f02b";
+$icon--comment-discussion: "\f04f";
+$icon--credit-card: "\f045";
+$icon--dash: "\f0ca";
+$icon--dashboard: "\f07d";
+$icon--database2: "\f096";
+$icon--device-camera: "\f056";
+$icon--device-camera-video: "\f057";
+$icon--device-desktop: "\f27c";
+$icon--device-mobile: "\f038";
+$icon--diff: "\f04d";
+$icon--diff-added: "\f06b";
+$icon--diff-ignored: "\f099";
+$icon--diff-modified: "\f06d";
+$icon--diff-removed: "\f06c";
+$icon--diff-renamed: "\f06e";
+$icon--ellipsis: "\f09a";
+$icon--eye2: "\f04e";
+$icon--file-binary: "\f094";
+$icon--file-code: "\f010";
+$icon--file-directory: "\f016";
+$icon--file-media: "\f012";
+$icon--file-pdf: "\f014";
+$icon--file-submodule: "\f017";
+$icon--file-symlink-directory: "\f0b1";
+$icon--file-symlink-file: "\f0b0";
+$icon--file-text: "\f011";
+$icon--file-zip: "\f013";
+$icon--flame: "\f0d2";
+$icon--fold: "\f0cc";
+$icon--gear: "\f02f";
+$icon--gift2: "\f042";
+$icon--gist: "\f00e";
+$icon--gist-secret: "\f08c";
+$icon--git-branch: "\f020";
+$icon--git-commit: "\f01f";
+$icon--git-compare: "\f0ac";
+$icon--git-merge: "\f023";
+$icon--git-pull-request: "\f009";
+$icon--globe: "\f0b6";
+$icon--graph2: "\f043";
+$icon--heart3: "\2665";
+$icon--history: "\f07e";
+$icon--home3: "\f08d";
+$icon--horizontal-rule: "\f070";
+$icon--hourglass: "\f09e";
+$icon--hubot: "\f09d";
+$icon--inbox2: "\f0cf";
+$icon--info2: "\f059";
+$icon--issue-closed: "\f028";
+$icon--issue-opened: "\f026";
+$icon--issue-reopened: "\f027";
+$icon--jersey: "\f019";
+$icon--jump-down: "\f072";
+$icon--jump-left: "\f0a5";
+$icon--jump-right: "\f0a6";
+$icon--jump-up: "\f073";
+$icon--key2: "\f049";
+$icon--keyboard2: "\f00d";
+$icon--law: "\f0d8";
+$icon--light-bulb: "\f000";
+$icon--link: "\f05c";
+$icon--link-external: "\f07f";
+$icon--list-ordered: "\f062";
+$icon--list-unordered: "\f061";
+$icon--location3: "\f060";
+$icon--lock2: "\f06a";
+$icon--logo-github: "\f092";
+$icon--mail: "\f03b";
+$icon--mail-read: "\f03c";
+$icon--mail-reply: "\f051";
+$icon--mark-github: "\f00a";
+$icon--markdown: "\f0c9";
+$icon--megaphone: "\f077";
+$icon--mention: "\f0be";
+$icon--microscope: "\f089";
+$icon--milestone: "\f075";
+$icon--mirror: "\f024";
+$icon--mortar-board: "\f0d7";
+$icon--move-down: "\f0a8";
+$icon--move-left: "\f074";
+$icon--move-right: "\f0a9";
+$icon--move-up: "\f0a7";
+$icon--mute2: "\f080";
+$icon--no-newline: "\f09c";
+$icon--octoface: "\f008";
+$icon--organization: "\f037";
+$icon--package: "\f0c4";
+$icon--paintcan: "\f0d1";
+$icon--pencil3: "\f058";
+$icon--person: "\f018";
+$icon--pin: "\f041";
+$icon--playback-fast-forward: "\f0bd";
+$icon--playback-pause: "\f0bb";
+$icon--playback-play: "\f0bf";
+$icon--playback-rewind: "\f0bc";
+$icon--plug: "\f0d4";
+$icon--plus2: "\f05d";
+$icon--podium: "\f0af";
+$icon--primitive-dot: "\f052";
+$icon--primitive-square: "\f053";
+$icon--pulse: "\f085";
+$icon--puzzle: "\f0c0";
+$icon--question: "\f02c";
+$icon--quote: "\f063";
+$icon--radio-tower: "\f030";
+$icon--repo: "\f001";
+$icon--repo-clone: "\f04c";
+$icon--repo-force-push: "\f04a";
+$icon--repo-forked: "\f002";
+$icon--repo-pull: "\f006";
+$icon--repo-push: "\f005";
+$icon--rocket: "\f033";
+$icon--rss: "\f034";
+$icon--ruby: "\f047";
+$icon--screen-full: "\f066";
+$icon--screen-normal: "\f067";
+$icon--search3: "\f02e";
+$icon--server: "\f097";
+$icon--settings2: "\f07c";
+$icon--sign-in: "\f036";
+$icon--sign-out: "\f032";
+$icon--split: "\f0c6";
+$icon--squirrel2: "\f0b2";
+$icon--star4: "\f02a";
+$icon--steps: "\f0c7";
+$icon--stop2: "\f08f";
+$icon--sync: "\f087";
+$icon--tag3: "\f015";
+$icon--telescope: "\f088";
+$icon--terminal: "\f0c8";
+$icon--three-bars: "\f05e";
+$icon--tools: "\f031";
+$icon--trashcan3: "\f0d0";
+$icon--triangle-down: "\f05b";
+$icon--triangle-left: "\f044";
+$icon--triangle-right: "\f05a";
+$icon--triangle-up: "\f0aa";
+$icon--unfold: "\f039";
+$icon--unmute: "\f0ba";
+$icon--versions: "\f064";
+$icon--x: "\f081";
+$icon--zap: "\26a1";
+$icon--glass: "\f003";
+$icon--music2: "\f004";
+$icon--search4: "\f00f";
+$icon--envelope-o: "\f01a";
+$icon--heart4: "\f01b";
+$icon--star5: "\f01c";
+$icon--star-o: "\f01d";
+$icon--user4: "\f01e";
+$icon--film2: "\f021";
+$icon--th-large: "\f022";
+$icon--th: "\f025";
+$icon--th-list: "\f029";
+$icon--check2: "\f04b";
+$icon--times: "\f050";
+$icon--search-plus: "\f054";
+$icon--search-minus: "\f055";
+$icon--power-off: "\f06f";
+$icon--signal: "\f079";
+$icon--gear2: "\f07a";
+$icon--trash-o: "\f082";
+$icon--home4: "\f083";
+$icon--file-o: "\f086";
+$icon--clock-o: "\f090";
+$icon--road: "\f093";
+$icon--download2: "\f095";
+$icon--arrow-circle-o-down: "\f098";
+$icon--arrow-circle-o-up: "\f09b";
+$icon--inbox3: "\f0ab";
+$icon--play-circle-o: "\f0ad";
+$icon--rotate-right: "\f0ae";
+$icon--refresh3: "\f0b3";
+$icon--list-alt: "\f0b4";
+$icon--lock3: "\f0b5";
+$icon--flag3: "\f0b7";
+$icon--headphones2: "\f0b8";
+$icon--volume-off: "\f0b9";
+$icon--volume-down: "\f0c1";
+$icon--volume-up: "\f0c2";
+$icon--qrcode: "\f0c3";
+$icon--barcode: "\f0cb";
+$icon--tag4: "\f0cd";
+$icon--tags: "\f0ce";
+$icon--book4: "\f0d5";
+$icon--bookmark5: "\f0d9";
+$icon--print: "\f0da";
+$icon--camera4: "\f0db";
+$icon--font: "\f0dc";
+$icon--bold: "\f0dd";
+$icon--italic: "\f0de";
+$icon--text-height: "\f0df";
+$icon--text-width: "\f0e0";
+$icon--align-left2: "\f0e1";
+$icon--align-center2: "\f0e2";
+$icon--align-right2: "\f0e3";
+$icon--align-justify2: "\f0e4";
+$icon--list3: "\f0e5";
+$icon--dedent: "\f0e6";
+$icon--indent: "\f0e7";
+$icon--video-camera: "\f0e8";
+$icon--photo: "\f0e9";
+$icon--pencil4: "\f0ea";
+$icon--map-marker: "\f0eb";
+$icon--adjust: "\f0ec";
+$icon--tint: "\f0ed";
+$icon--edit: "\f0ee";
+$icon--share-square-o: "\f0ef";
+$icon--check-square-o: "\f0f0";
+$icon--arrows: "\f0f1";
+$icon--step-backward: "\f0f2";
+$icon--fast-backward: "\f0f3";
+$icon--backward: "\f0f4";
+$icon--play2: "\f0f5";
+$icon--pause2: "\f0f6";
+$icon--stop3: "\f0f7";
+$icon--forward2: "\f0f8";
+$icon--fast-forward: "\f0f9";
+$icon--step-forward: "\f0fa";
+$icon--eject: "\f0fb";
+$icon--chevron-left2: "\f0fc";
+$icon--chevron-right2: "\f0fd";
+$icon--plus-circle: "\f0fe";
+$icon--minus-circle: "\f0ff";
+$icon--times-circle: "\f100";
+$icon--check-circle: "\f101";
+$icon--question-circle: "\f102";
+$icon--info-circle: "\f103";
+$icon--crosshairs: "\f104";
+$icon--times-circle-o: "\f105";
+$icon--check-circle-o: "\f106";
+$icon--ban: "\f107";
+$icon--arrow-left3: "\f108";
+$icon--arrow-right3: "\f109";
+$icon--arrow-up3: "\f10a";
+$icon--arrow-down3: "\f10b";
+$icon--mail-forward: "\f10c";
+$icon--expand: "\f10d";
+$icon--compress: "\f10e";
+$icon--plus3: "\f10f";
+$icon--minus2: "\f110";
+$icon--asterisk: "\f111";
+$icon--exclamation-circle: "\f112";
+$icon--gift3: "\f113";
+$icon--leaf: "\f114";
+$icon--fire: "\f115";
+$icon--eye3: "\f116";
+$icon--eye-slash: "\f117";
+$icon--warning2: "\f118";
+$icon--plane: "\f119";
+$icon--calendar4: "\f11a";
+$icon--random: "\f11b";
+$icon--comment4: "\f11c";
+$icon--magnet: "\f11d";
+$icon--chevron-up2: "\f11e";
+$icon--chevron-down2: "\f11f";
+$icon--retweet: "\f120";
+$icon--shopping-cart: "\f121";
+$icon--folder3: "\f122";
+$icon--folder-open: "\f123";
+$icon--arrows-v: "\f124";
+$icon--arrows-h: "\f125";
+$icon--bar-chart-o: "\f126";
+$icon--twitter-square: "\f127";
+$icon--facebook-square: "\f128";
+$icon--camera-retro: "\f129";
+$icon--key3: "\f12a";
+$icon--gears: "\f12b";
+$icon--comments: "\f12c";
+$icon--thumbs-o-up: "\f12d";
+$icon--thumbs-o-down: "\f12e";
+$icon--star-half: "\f12f";
+$icon--heart-o: "\f130";
+$icon--sign-out2: "\f131";
+$icon--linkedin-square: "\f132";
+$icon--thumb-tack: "\f133";
+$icon--external-link: "\f134";
+$icon--sign-in2: "\f135";
+$icon--trophy2: "\f136";
+$icon--github-square: "\f137";
+$icon--upload: "\f138";
+$icon--lemon-o: "\f139";
+$icon--phone3: "\f13a";
+$icon--square-o: "\f13b";
+$icon--bookmark-o: "\f13c";
+$icon--phone-square: "\f13d";
+$icon--twitter2: "\f13e";
+$icon--facebook: "\f13f";
+$icon--github: "\f140";
+$icon--unlock: "\f141";
+$icon--credit-card2: "\f142";
+$icon--rss2: "\f143";
+$icon--hdd-o: "\f144";
+$icon--bullhorn2: "\f145";
+$icon--bell-o: "\f146";
+$icon--certificate: "\f147";
+$icon--hand-o-right: "\f148";
+$icon--hand-o-left: "\f149";
+$icon--hand-o-up: "\f14a";
+$icon--hand-o-down: "\f14b";
+$icon--arrow-circle-left: "\f14c";
+$icon--arrow-circle-right: "\f14d";
+$icon--arrow-circle-up: "\f14e";
+$icon--arrow-circle-down: "\f14f";
+$icon--globe2: "\f150";
+$icon--wrench2: "\f151";
+$icon--tasks: "\f152";
+$icon--filter2: "\f153";
+$icon--briefcase3: "\f154";
+$icon--arrows-alt: "\f155";
+$icon--group: "\f156";
+$icon--chain: "\f157";
+$icon--cloud8: "\f158";
+$icon--flask: "\f159";
+$icon--cut: "\f15a";
+$icon--copy: "\f15b";
+$icon--paperclip3: "\f15c";
+$icon--save: "\f15d";
+$icon--square: "\f15e";
+$icon--navicon: "\f15f";
+$icon--list-ul: "\f160";
+$icon--list-ol: "\f161";
+$icon--strikethrough: "\f162";
+$icon--underline: "\f163";
+$icon--table: "\f164";
+$icon--magic: "\f165";
+$icon--truck: "\f166";
+$icon--pinterest: "\f167";
+$icon--pinterest-square: "\f168";
+$icon--google-plus-square: "\f169";
+$icon--google-plus: "\f16a";
+$icon--money: "\f16b";
+$icon--caret-down: "\f16c";
+$icon--caret-up: "\f16d";
+$icon--caret-left: "\f16e";
+$icon--caret-right: "\f16f";
+$icon--columns: "\f170";
+$icon--unsorted: "\f171";
+$icon--sort-down: "\f172";
+$icon--sort-up: "\f173";
+$icon--envelope3: "\f174";
+$icon--linkedin: "\f175";
+$icon--rotate-left: "\f176";
+$icon--legal: "\f177";
+$icon--dashboard2: "\f178";
+$icon--comment-o: "\f179";
+$icon--comments-o: "\f17a";
+$icon--flash: "\f17b";
+$icon--sitemap: "\f17c";
+$icon--umbrella: "\f17d";
+$icon--paste: "\f17e";
+$icon--lightbulb-o: "\f17f";
+$icon--exchange: "\f180";
+$icon--cloud-download2: "\f181";
+$icon--cloud-upload2: "\f182";
+$icon--user-md: "\f183";
+$icon--stethoscope: "\f184";
+$icon--suitcase: "\f185";
+$icon--bell: "\f186";
+$icon--coffee3: "\f187";
+$icon--cutlery: "\f188";
+$icon--file-text-o: "\f189";
+$icon--building-o: "\f18a";
+$icon--hospital-o: "\f18b";
+$icon--ambulance: "\f18c";
+$icon--medkit: "\f18d";
+$icon--fighter-jet: "\f18e";
+$icon--beer2: "\f18f";
+$icon--h-square: "\f190";
+$icon--plus-square: "\f191";
+$icon--angle-double-left: "\f192";
+$icon--angle-double-right: "\f193";
+$icon--angle-double-up: "\f194";
+$icon--angle-double-down: "\f195";
+$icon--angle-left: "\f196";
+$icon--angle-right: "\f197";
+$icon--angle-up: "\f198";
+$icon--angle-down: "\f199";
+$icon--desktop: "\f19a";
+$icon--laptop2: "\f19b";
+$icon--tablet2: "\f19c";
+$icon--mobile-phone: "\f19d";
+$icon--circle-o: "\f19e";
+$icon--quote-left: "\f19f";
+$icon--quote-right: "\f1a0";
+$icon--spinner: "\f1a1";
+$icon--circle: "\f1a2";
+$icon--mail-reply2: "\f1a3";
+$icon--github-alt: "\f1a4";
+$icon--folder-o: "\f1a5";
+$icon--folder-open-o: "\f1a6";
+$icon--smile-o: "\f1a7";
+$icon--frown-o: "\f1a8";
+$icon--meh-o: "\f1a9";
+$icon--gamepad: "\f1aa";
+$icon--keyboard-o: "\f1ab";
+$icon--flag-o: "\f1ac";
+$icon--flag-checkered: "\f1ad";
+$icon--terminal2: "\f1ae";
+$icon--code3: "\f1af";
+$icon--mail-reply-all: "\f1b0";
+$icon--star-half-empty: "\f1b1";
+$icon--location-arrow: "\f1b2";
+$icon--crop3: "\f1b3";
+$icon--code-fork: "\f1b4";
+$icon--unlink: "\f1b5";
+$icon--question2: "\f1b6";
+$icon--info3: "\f1b7";
+$icon--exclamation: "\f1b8";
+$icon--superscript: "\f1b9";
+$icon--subscript: "\f1ba";
+$icon--eraser: "\f1bb";
+$icon--puzzle-piece: "\f1bc";
+$icon--microphone2: "\f1bd";
+$icon--microphone-slash: "\f1be";
+$icon--shield: "\f1bf";
+$icon--calendar-o: "\f1c0";
+$icon--fire-extinguisher: "\f1c1";
+$icon--rocket2: "\f1c2";
+$icon--maxcdn: "\f1c3";
+$icon--chevron-circle-left: "\f1c4";
+$icon--chevron-circle-right: "\f1c5";
+$icon--chevron-circle-up: "\f1c6";
+$icon--chevron-circle-down: "\f1c7";
+$icon--html5: "\f1c8";
+$icon--css3: "\f1c9";
+$icon--anchor: "\f1ca";
+$icon--unlock-alt: "\f1cb";
+$icon--bullseye: "\f1cc";
+$icon--ellipsis-h: "\f1cd";
+$icon--ellipsis-v: "\f1ce";
+$icon--rss-square: "\f1cf";
+$icon--play-circle: "\f1d0";
+$icon--ticket: "\f1d1";
+$icon--minus-square: "\f1d2";
+$icon--minus-square-o: "\f1d3";
+$icon--level-up: "\f1d4";
+$icon--level-down: "\f1d5";
+$icon--check-square: "\f1d6";
+$icon--pencil-square: "\f1d7";
+$icon--external-link-square: "\f1d8";
+$icon--share-square: "\f1d9";
+$icon--compass3: "\f1da";
+$icon--toggle-down: "\f1db";
+$icon--toggle-up: "\f1dc";
+$icon--toggle-right: "\f1dd";
+$icon--euro: "\f1de";
+$icon--gbp: "\f1df";
+$icon--dollar: "\f1e0";
+$icon--rupee: "\f1e1";
+$icon--cny: "\f1e2";
+$icon--ruble: "\f1e3";
+$icon--won: "\f1e4";
+$icon--bitcoin: "\f1e5";
+$icon--file3: "\f1e6";
+$icon--file-text2: "\f1e7";
+$icon--sort-alpha-asc: "\f1e8";
+$icon--sort-alpha-desc: "\f1e9";
+$icon--sort-amount-asc: "\f1ea";
+$icon--sort-amount-desc: "\f1eb";
+$icon--sort-numeric-asc: "\f1ec";
+$icon--sort-numeric-desc: "\f1ed";
+$icon--thumbs-up: "\f1ee";
+$icon--thumbs-down: "\f1ef";
+$icon--youtube-square: "\f1f0";
+$icon--youtube: "\f1f1";
+$icon--xing: "\f1f2";
+$icon--xing-square: "\f1f3";
+$icon--youtube-play: "\f1f4";
+$icon--dropbox: "\f1f5";
+$icon--stack-overflow: "\f1f6";
+$icon--instagram: "\f1f7";
+$icon--flickr: "\f1f8";
+$icon--adn: "\f1f9";
+$icon--bitbucket: "\f1fa";
+$icon--bitbucket-square: "\f1fb";
+$icon--tumblr: "\f1fc";
+$icon--tumblr-square: "\f1fd";
+$icon--long-arrow-down: "\f1fe";
+$icon--long-arrow-up: "\f1ff";
+$icon--long-arrow-left: "\f200";
+$icon--long-arrow-right: "\f201";
+$icon--apple2: "\f202";
+$icon--windows2: "\f203";
+$icon--android: "\f204";
+$icon--linux: "\f205";
+$icon--dribbble2: "\f206";
+$icon--skype2: "\f207";
+$icon--foursquare: "\f208";
+$icon--trello: "\f209";
+$icon--female: "\f20a";
+$icon--male: "\f20b";
+$icon--gittip: "\f20c";
+$icon--sun-o: "\f20d";
+$icon--moon-o: "\f20e";
+$icon--archive2: "\f20f";
+$icon--bug3: "\f210";
+$icon--vk: "\f211";
+$icon--weibo: "\f212";
+$icon--renren: "\f213";
+$icon--pagelines: "\f214";
+$icon--stack-exchange: "\f215";
+$icon--arrow-circle-o-right: "\f216";
+$icon--arrow-circle-o-left: "\f217";
+$icon--toggle-left: "\f218";
+$icon--dot-circle-o: "\f219";
+$icon--wheelchair: "\f21a";
+$icon--vimeo-square: "\f21b";
+$icon--turkish-lira: "\f21c";
+$icon--plus-square-o: "\f21d";
+$icon--space-shuttle: "\f21e";
+$icon--slack: "\f21f";
+$icon--envelope-square: "\f220";
+$icon--wordpress: "\f221";
+$icon--openid: "\f222";
+$icon--institution: "\f223";
+$icon--mortar-board2: "\f224";
+$icon--yahoo: "\f225";
+$icon--google: "\f226";
+$icon--reddit: "\f227";
+$icon--reddit-square: "\f228";
+$icon--stumbleupon-circle: "\f229";
+$icon--stumbleupon: "\f22a";
+$icon--delicious: "\f22b";
+$icon--digg: "\f22c";
+$icon--pied-piper-square: "\f22d";
+$icon--pied-piper-alt: "\f22e";
+$icon--drupal: "\f22f";
+$icon--joomla: "\f230";
+$icon--language: "\f231";
+$icon--fax: "\f232";
+$icon--building: "\f233";
+$icon--child: "\f234";
+$icon--paw: "\f235";
+$icon--spoon: "\f236";
+$icon--cube2: "\f237";
+$icon--cubes: "\f238";
+$icon--behance: "\f239";
+$icon--behance-square: "\f23a";
+$icon--steam: "\f23b";
+$icon--steam-square: "\f23c";
+$icon--recycle: "\f23d";
+$icon--automobile: "\f23e";
+$icon--cab: "\f23f";
+$icon--tree: "\f240";
+$icon--spotify: "\f241";
+$icon--deviantart: "\f242";
+$icon--soundcloud: "\f243";
+$icon--database3: "\f244";
+$icon--file-pdf-o: "\f245";
+$icon--file-word-o: "\f246";
+$icon--file-excel-o: "\f247";
+$icon--file-powerpoint-o: "\f248";
+$icon--file-photo-o: "\f249";
+$icon--file-zip-o: "\f24a";
+$icon--file-sound-o: "\f24b";
+$icon--file-movie-o: "\f24c";
+$icon--file-code-o: "\f24d";
+$icon--vine: "\f24e";
+$icon--codepen: "\f24f";
+$icon--jsfiddle: "\f250";
+$icon--life-bouy: "\f251";
+$icon--circle-o-notch: "\f252";
+$icon--ra: "\f253";
+$icon--ge: "\f254";
+$icon--git-square: "\f255";
+$icon--git: "\f256";
+$icon--hacker-news: "\f257";
+$icon--tencent-weibo: "\f258";
+$icon--qq: "\f259";
+$icon--wechat: "\f25a";
+$icon--send: "\f25b";
+$icon--send-o: "\f25c";
+$icon--history2: "\f25d";
+$icon--circle-thin: "\f25e";
+$icon--header: "\f25f";
+$icon--paragraph: "\f260";
+$icon--sliders: "\f261";
+$icon--share-alt: "\f262";
+$icon--share-alt-square: "\f263";
+$icon--bomb: "\f264";
+$icon--number: "\ea27";
+$icon--number2: "\ea28";
+$icon--number3: "\ea29";
+$icon--number4: "\ea2a";
+$icon--number5: "\ea2b";
+$icon--number6: "\ea2c";
+$icon--number7: "\ea2d";
+$icon--number8: "\ea2e";
+$icon--number9: "\ea2f";
+$icon--number10: "\ea30";
+$icon--number11: "\ea31";
+$icon--number12: "\ea32";
+$icon--number13: "\ea33";
+$icon--number14: "\ea34";
+$icon--number15: "\ea35";
+$icon--number16: "\ea36";
+$icon--number17: "\ea37";
+$icon--number18: "\ea38";
+$icon--number19: "\ea39";
+$icon--number20: "\ea3a";
+$icon--quote2: "\ea3b";
+$icon--quote3: "\ea3c";
+$icon--tag5: "\ea3d";
+$icon--tag6: "\ea3e";
+$icon--link2: "\ea3f";
+$icon--link3: "\ea40";
+$icon--cabinet: "\ea41";
+$icon--cabinet2: "\ea42";
+$icon--calendar5: "\ea43";
+$icon--calendar6: "\ea44";
+$icon--calendar7: "\ea45";
+$icon--file4: "\ea46";
+$icon--file5: "\ea47";
+$icon--file6: "\ea48";
+$icon--files2: "\ea49";
+$icon--phone4: "\ea4a";
+$icon--tablet3: "\ea4b";
+$icon--window3: "\ea4c";
+$icon--monitor2: "\ea4d";
+$icon--ipod2: "\ea4e";
+$icon--tv: "\ea4f";
+$icon--camera5: "\ea50";
+$icon--camera6: "\ea51";
+$icon--camera7: "\ea52";
+$icon--film3: "\ea53";
+$icon--film4: "\ea54";
+$icon--film5: "\ea55";
+$icon--microphone3: "\ea56";
+$icon--microphone4: "\ea57";
+$icon--microphone5: "\ea58";
+$icon--drink2: "\ea59";
+$icon--drink3: "\ea5a";
+$icon--drink4: "\ea5b";
+$icon--drink5: "\ea5c";
+$icon--coffee4: "\ea5d";
+$icon--mug2: "\ea5e";
+$icon--icecream: "\ea5f";
+$icon--cake: "\ea60";
+$icon--inbox4: "\ea61";
+$icon--download3: "\ea62";
+$icon--upload2: "\ea63";
+$icon--inbox5: "\ea64";
+$icon--checkmark3: "\ea65";
+$icon--checkmark4: "\ea66";
+$icon--cancel2: "\ea67";
+$icon--cancel3: "\ea68";
+$icon--plus4: "\ea69";
+$icon--plus5: "\ea6a";
+$icon--minus3: "\ea6b";
+$icon--minus4: "\ea6c";
+$icon--notice: "\ea6d";
+$icon--notice2: "\ea6e";
+$icon--cog3: "\ea6f";
+$icon--cogs: "\ea70";
+$icon--cog4: "\ea71";
+$icon--warning3: "\ea72";
+$icon--health2: "\ea73";
+$icon--suitcase2: "\ea74";
+$icon--suitcase3: "\ea75";
+$icon--suitcase4: "\ea76";
+$icon--picture2: "\ea77";
+$icon--pictures: "\ea78";
+$icon--pictures2: "\ea79";
+$icon--android2: "\ea7a";
+$icon--marvin: "\ea7b";
+$icon--pacman: "\ea7c";
+$icon--cassette: "\ea7d";
+$icon--watch: "\ea7e";
+$icon--chronometer: "\ea7f";
+$icon--watch2: "\ea80";
+$icon--alarmclock: "\ea81";
+$icon--time: "\ea82";
+$icon--time2: "\ea83";
+$icon--headphones3: "\ea84";
+$icon--wallet: "\ea85";
+$icon--checkmark5: "\ea86";
+$icon--cancel4: "\ea87";
+$icon--eye4: "\ea88";
+$icon--position: "\ea89";
+$icon--sitemap2: "\ea8a";
+$icon--sitemap3: "\ea8b";
+$icon--cloud9: "\ea8c";
+$icon--upload3: "\ea8d";
+$icon--chart3: "\ea8e";
+$icon--chart4: "\ea8f";
+$icon--chart5: "\ea90";
+$icon--chart6: "\ea91";
+$icon--chart7: "\ea92";
+$icon--chart8: "\ea93";
+$icon--location4: "\ea94";
+$icon--download4: "\ea95";
+$icon--basket2: "\ea96";
+$icon--folder4: "\ea97";
+$icon--gamepad2: "\ea98";
+$icon--alarm2: "\ea99";
+$icon--alarm-cancel: "\ea9a";
+$icon--phone5: "\ea9b";
+$icon--phone6: "\ea9c";
+$icon--image2: "\ea9d";
+$icon--open: "\ea9e";
+$icon--sale: "\ea9f";
+$icon--direction: "\eaa0";
+$icon--map2: "\eaa1";
+$icon--trashcan4: "\eaa2";
+$icon--vote: "\eaa3";
+$icon--graduate: "\eaa4";
+$icon--lab2: "\eaa5";
+$icon--tie: "\eaa6";
+$icon--football: "\eaa7";
+$icon--eightball: "\eaa8";
+$icon--bowling: "\eaa9";
+$icon--bowlingpin: "\eaaa";
+$icon--baseball: "\eaab";
+$icon--soccer: "\eaac";
+$icon--3dglasses: "\eaad";
+$icon--microwave: "\eaae";
+$icon--refrigerator: "\eaaf";
+$icon--oven: "\eab0";
+$icon--washingmachine: "\eab1";
+$icon--mouse2: "\eab2";
+$icon--smiley2: "\eab3";
+$icon--sad: "\eab4";
+$icon--mute3: "\eab5";
+$icon--hand: "\eab6";
+$icon--radio: "\eab7";
+$icon--satellite: "\eab8";
+$icon--medal: "\eab9";
+$icon--medal2: "\eaba";
+$icon--switch3: "\eabb";
+$icon--key4: "\eabc";
+$icon--cord: "\eabd";
+$icon--locked2: "\eabe";
+$icon--unlocked3: "\eabf";
+$icon--locked3: "\eac0";
+$icon--unlocked4: "\eac1";
+$icon--magnifier: "\eac2";
+$icon--zoomin2: "\eac3";
+$icon--zoomout2: "\eac4";
+$icon--stack2: "\eac5";
+$icon--stack3: "\eac6";
+$icon--stack4: "\eac7";
+$icon--davidstar: "\eac8";
+$icon--cross: "\eac9";
+$icon--moonandstar: "\eaca";
+$icon--transformers: "\eacb";
+$icon--batman: "\eacc";
+$icon--spaceinvaders: "\eacd";
+$icon--skeletor: "\eace";
+$icon--lamp2: "\eacf";
+$icon--lamp3: "\ead0";
+$icon--umbrella2: "\ead1";
+$icon--streetlight: "\ead2";
+$icon--bomb2: "\ead3";
+$icon--archive3: "\ead4";
+$icon--battery2: "\ead5";
+$icon--battery3: "\ead6";
+$icon--battery4: "\ead7";
+$icon--battery5: "\ead8";
+$icon--battery6: "\ead9";
+$icon--megaphone2: "\eada";
+$icon--megaphone3: "\eadb";
+$icon--patch: "\eadc";
+$icon--pil: "\eadd";
+$icon--injection: "\eade";
+$icon--thermometer2: "\eadf";
+$icon--lamp4: "\eae0";
+$icon--lamp5: "\eae1";
+$icon--lamp6: "\eae2";
+$icon--cube3: "\eae3";
+$icon--box2: "\eae4";
+$icon--box3: "\eae5";
+$icon--diamond2: "\eae6";
+$icon--bag2: "\eae7";
+$icon--moneybag: "\eae8";
+$icon--grid3: "\eae9";
+$icon--grid4: "\eaea";
+$icon--list4: "\eaeb";
+$icon--list5: "\eaec";
+$icon--ruler: "\eaed";
+$icon--ruler2: "\eaee";
+$icon--layout: "\eaef";
+$icon--layout2: "\eaf0";
+$icon--layout3: "\eaf1";
+$icon--layout4: "\eaf2";
+$icon--layout5: "\eaf3";
+$icon--layout6: "\eaf4";
+$icon--layout7: "\eaf5";
+$icon--layout8: "\eaf6";
+$icon--layout9: "\eaf7";
+$icon--layout10: "\eaf8";
+$icon--layout11: "\eaf9";
+$icon--layout12: "\eafa";
+$icon--layout13: "\eafb";
+$icon--layout14: "\eafc";
+$icon--tools2: "\eafd";
+$icon--screwdriver: "\eafe";
+$icon--paint: "\eaff";
+$icon--hammer: "\eb00";
+$icon--brush: "\eb01";
+$icon--pen: "\eb02";
+$icon--chat2: "\eb03";
+$icon--comments2: "\eb04";
+$icon--chat3: "\eb05";
+$icon--chat4: "\eb06";
+$icon--volume4: "\eb07";
+$icon--volume5: "\eb08";
+$icon--volume6: "\eb09";
+$icon--equalizer: "\eb0a";
+$icon--resize: "\eb0b";
+$icon--resize2: "\eb0c";
+$icon--stretch: "\eb0d";
+$icon--narrow: "\eb0e";
+$icon--resize3: "\eb0f";
+$icon--download5: "\eb10";
+$icon--calculator2: "\eb11";
+$icon--library: "\eb12";
+$icon--auction: "\eb13";
+$icon--justice: "\eb14";
+$icon--stats2: "\eb15";
+$icon--stats3: "\eb16";
+$icon--attachment: "\eb17";
+$icon--hourglass2: "\eb18";
+$icon--abacus: "\eb19";
+$icon--pencil5: "\eb1a";
+$icon--pen2: "\eb1b";
+$icon--pin2: "\eb1c";
+$icon--pin3: "\eb1d";
+$icon--discout: "\eb1e";
+$icon--edit2: "\eb1f";
+$icon--scissors: "\eb20";
+$icon--profile: "\eb21";
+$icon--profile2: "\eb22";
+$icon--profile3: "\eb23";
+$icon--rotate: "\eb24";
+$icon--rotate2: "\eb25";
+$icon--reply: "\eb26";
+$icon--forward3: "\eb27";
+$icon--retweet2: "\eb28";
+$icon--shuffle: "\eb29";
+$icon--loop3: "\eb2a";
+$icon--crop4: "\eb2b";
+$icon--square2: "\eb2c";
+$icon--square3: "\eb2d";
+$icon--circle2: "\eb2e";
+$icon--dollar2: "\eb2f";
+$icon--dollar3: "\eb30";
+$icon--coins: "\eb31";
+$icon--pig: "\eb32";
+$icon--bookmark6: "\eb33";
+$icon--bookmark7: "\eb34";
+$icon--addressbook2: "\eb35";
+$icon--addressbook3: "\eb36";
+$icon--safe: "\eb37";
+$icon--envelope4: "\eb38";
+$icon--envelope5: "\eb39";
+$icon--radioactive: "\eb3a";
+$icon--music3: "\eb3b";
+$icon--presentation: "\eb3c";
+$icon--male2: "\eb3d";
+$icon--female2: "\eb3e";
+$icon--aids: "\eb3f";
+$icon--heart5: "\eb40";
+$icon--info4: "\eb41";
+$icon--info5: "\eb42";
+$icon--piano: "\eb43";
+$icon--rain: "\eb44";
+$icon--snow: "\eb45";
+$icon--lightning6: "\eb46";
+$icon--sun5: "\eb47";
+$icon--moon3: "\eb48";
+$icon--cloudy5: "\eb49";
+$icon--cloudy6: "\eb4a";
+$icon--car: "\eb4b";
+$icon--bike: "\eb4c";
+$icon--truck2: "\eb4d";
+$icon--bus: "\eb4e";
+$icon--bike2: "\eb4f";
+$icon--plane2: "\eb50";
+$icon--paperplane: "\eb51";
+$icon--rocket3: "\eb52";
+$icon--book5: "\eb53";
+$icon--book6: "\eb54";
+$icon--barcode2: "\eb55";
+$icon--barcode3: "\eb56";
+$icon--expand2: "\eb57";
+$icon--collapse: "\eb58";
+$icon--popout: "\eb59";
+$icon--popin: "\eb5a";
+$icon--target4: "\eb5b";
+$icon--badge: "\eb5c";
+$icon--badge2: "\eb5d";
+$icon--ticket2: "\eb5e";
+$icon--ticket3: "\eb5f";
+$icon--ticket4: "\eb60";
+$icon--microphone6: "\eb61";
+$icon--cone2: "\eb62";
+$icon--blocked2: "\eb63";
+$icon--stop4: "\eb64";
+$icon--keyboard3: "\eb65";
+$icon--keyboard4: "\eb66";
+$icon--radio2: "\eb67";
+$icon--printer2: "\eb68";
+$icon--checked: "\eb69";
+$icon--error: "\eb6a";
+$icon--add: "\eb6b";
+$icon--minus5: "\eb6c";
+$icon--alert2: "\eb6d";
+$icon--pictures3: "\eb6e";
+$icon--atom3: "\eb6f";
+$icon--eyedropper2: "\eb70";
+$icon--globe3: "\eb71";
+$icon--globe4: "\eb72";
+$icon--shipping: "\eb73";
+$icon--yingyang: "\eb74";
+$icon--compass4: "\eb75";
+$icon--zip: "\eb76";
+$icon--zip2: "\eb77";
+$icon--anchor2: "\eb78";
+$icon--lockedheart: "\eb79";
+$icon--magnet2: "\eb7a";
+$icon--navigation: "\eb7b";
+$icon--tags2: "\eb7c";
+$icon--heart6: "\eb7d";
+$icon--heart7: "\eb7e";
+$icon--usb: "\eb7f";
+$icon--clipboard2: "\eb80";
+$icon--clipboard3: "\eb81";
+$icon--clipboard4: "\eb82";
+$icon--switch4: "\eb83";
+$icon--ruler3: "\eb84";
+$icon--home5: "\eb85";
+$icon--home6: "\eb86";
+$icon--home7: "\eb87";
+$icon--office: "\eb88";
+$icon--newspaper2: "\eb89";
+$icon--pencil6: "\eb8a";
+$icon--pencil7: "\eb8b";
+$icon--quill: "\eb8c";
+$icon--pen3: "\eb8d";
+$icon--blog: "\eb8e";
+$icon--droplet2: "\eb8f";
+$icon--paint-format: "\eb90";
+$icon--image3: "\eb91";
+$icon--image4: "\eb92";
+$icon--images: "\eb93";
+$icon--camera8: "\eb94";
+$icon--music4: "\eb95";
+$icon--headphones4: "\eb96";
+$icon--play3: "\eb97";
+$icon--film6: "\eb98";
+$icon--camera9: "\eb99";
+$icon--dice: "\eb9a";
+$icon--pacman2: "\eb9b";
+$icon--spades: "\eb9c";
+$icon--clubs: "\eb9d";
+$icon--diamonds: "\eb9e";
+$icon--pawn: "\eb9f";
+$icon--bullhorn3: "\eba0";
+$icon--connection: "\eba1";
+$icon--podcast: "\eba2";
+$icon--feed2: "\eba3";
+$icon--book7: "\eba4";
+$icon--books: "\eba5";
+$icon--library2: "\eba6";
+$icon--file7: "\eba7";
+$icon--profile4: "\eba8";
+$icon--file8: "\eba9";
+$icon--file9: "\ebaa";
+$icon--file10: "\ebab";
+$icon--copy2: "\ebac";
+$icon--copy3: "\ebad";
+$icon--copy4: "\ebae";
+$icon--paste2: "\ebaf";
+$icon--paste3: "\ebb0";
+$icon--paste4: "\ebb1";
+$icon--stack5: "\ebb2";
+$icon--folder5: "\ebb3";
+$icon--folder-open2: "\ebb4";
+$icon--tag7: "\ebb5";
+$icon--tags3: "\ebb6";
+$icon--barcode4: "\ebb7";
+$icon--qrcode2: "\ebb8";
+$icon--ticket5: "\ebb9";
+$icon--cart2: "\ebba";
+$icon--cart3: "\ebbb";
+$icon--cart4: "\ebbc";
+$icon--coin: "\ebbd";
+$icon--credit: "\ebbe";
+$icon--calculate: "\ebbf";
+$icon--support2: "\ebc0";
+$icon--phone7: "\ebc1";
+$icon--phone-hang-up: "\ebc2";
+$icon--address-book: "\ebc3";
+$icon--notebook: "\ebc4";
+$icon--envelope6: "\ebc5";
+$icon--pushpin: "\ebc6";
+$icon--location5: "\ebc7";
+$icon--location6: "\ebc8";
+$icon--compass5: "\ebc9";
+$icon--map3: "\ebca";
+$icon--map4: "\ebcb";
+$icon--history3: "\ebcc";
+$icon--clock4: "\ebcd";
+$icon--clock5: "\ebce";
+$icon--alarm3: "\ebcf";
+$icon--alarm4: "\ebd0";
+$icon--bell2: "\ebd1";
+$icon--stopwatch2: "\ebd2";
+$icon--calendar8: "\ebd3";
+$icon--calendar9: "\ebd4";
+$icon--print2: "\ebd5";
+$icon--keyboard5: "\ebd6";
+$icon--screen2: "\ebd7";
+$icon--laptop3: "\ebd8";
+$icon--mobile2: "\ebd9";
+$icon--mobile3: "\ebda";
+$icon--tablet4: "\ebdb";
+$icon--tv2: "\ebdc";
+$icon--cabinet3: "\ebdd";
+$icon--drawer: "\ebde";
+$icon--drawer2: "\ebdf";
+$icon--drawer3: "\ebe0";
+$icon--box-add: "\ebe1";
+$icon--box-remove: "\ebe2";
+$icon--download6: "\ebe3";
+$icon--upload4: "\ebe4";
+$icon--disk2: "\ebe5";
+$icon--storage: "\ebe6";
+$icon--undo: "\ebe7";
+$icon--redo: "\ebe8";
+$icon--flip: "\ebe9";
+$icon--flip2: "\ebea";
+$icon--undo2: "\ebeb";
+$icon--redo2: "\ebec";
+$icon--forward4: "\ebed";
+$icon--reply2: "\ebee";
+$icon--bubble: "\ebef";
+$icon--bubbles: "\ebf0";
+$icon--bubbles2: "\ebf1";
+$icon--bubble2: "\ebf2";
+$icon--bubbles3: "\ebf3";
+$icon--bubbles4: "\ebf4";
+$icon--user5: "\ebf5";
+$icon--users3: "\ebf6";
+$icon--user6: "\ebf7";
+$icon--users4: "\ebf8";
+$icon--user7: "\ebf9";
+$icon--user8: "\ebfa";
+$icon--quotes-left: "\ebfb";
+$icon--busy: "\ebfc";
+$icon--spinner2: "\ebfd";
+$icon--spinner3: "\ebfe";
+$icon--spinner4: "\ebff";
+$icon--spinner5: "\ec00";
+$icon--spinner6: "\ec01";
+$icon--spinner7: "\ec02";
+$icon--binoculars: "\ec03";
+$icon--search5: "\ec04";
+$icon--zoomin3: "\ec05";
+$icon--zoomout3: "\ec06";
+$icon--expand3: "\ec07";
+$icon--contract: "\ec08";
+$icon--expand4: "\ec09";
+$icon--contract2: "\ec0a";
+$icon--key5: "\ec0b";
+$icon--key6: "\ec0c";
+$icon--lock4: "\ec0d";
+$icon--lock5: "\ec0e";
+$icon--unlocked5: "\ec0f";
+$icon--wrench3: "\ec10";
+$icon--settings3: "\ec11";
+$icon--equalizer2: "\ec12";
+$icon--cog5: "\e600";
+$icon--cogs2: "\ec13";
+$icon--cog2: "\e601";
+$icon--hammer2: "\ec14";
+$icon--wand: "\ec15";
+$icon--aid: "\ec16";
+$icon--bug4: "\ec17";
+$icon--pie: "\ec18";
+$icon--stats4: "\ec19";
+$icon--bars2: "\ec1a";
+$icon--bars3: "\ec1b";
+$icon--gift4: "\ec1c";
+$icon--trophy3: "\ec1d";
+$icon--glass2: "\ec1e";
+$icon--mug3: "\ec1f";
+$icon--food: "\ec20";
+$icon--leaf2: "\ec21";
+$icon--rocket4: "\ec22";
+$icon--meter2: "\ec23";
+$icon--meter22: "\ec24";
+$icon--dashboard3: "\ec25";
+$icon--hammer3: "\ec26";
+$icon--fire2: "\ec27";
+$icon--lab3: "\ec28";
+$icon--magnet3: "\ec29";
+$icon--remove: "\ec2a";
+$icon--remove2: "\ec2b";
+$icon--briefcase4: "\ec2c";
+$icon--airplane: "\ec2d";
+$icon--truck3: "\ec2e";
+$icon--road2: "\ec2f";
+$icon--accessibility: "\ec30";
+$icon--target5: "\ec31";
+$icon--shield2: "\ec32";
+$icon--lightning7: "\ec33";
+$icon--switch5: "\ec34";
+$icon--powercord: "\ec35";
+$icon--signup: "\ec36";
+$icon--list6: "\ec37";
+$icon--list7: "\ec38";
+$icon--numbered-list: "\ec39";
+$icon--menu: "\ec3a";
+$icon--menu2: "\ec3b";
+$icon--tree2: "\ec3c";
+$icon--cloud10: "\ec3d";
+$icon--cloud-download3: "\ec3e";
+$icon--cloud-upload3: "\ec3f";
+$icon--download7: "\ec40";
+$icon--upload5: "\ec41";
+$icon--download8: "\ec42";
+$icon--upload6: "\ec43";
+$icon--globe5: "\ec44";
+$icon--earth2: "\ec45";
+$icon--link4: "\ec46";
+$icon--flag4: "\ec47";
+$icon--attachment2: "\ec48";
+$icon--eye5: "\ec49";
+$icon--eye-blocked: "\ec4a";
+$icon--eye6: "\ec4b";
+$icon--bookmark8: "\ec4c";
+$icon--bookmarks: "\ec4d";
+$icon--brightness-medium: "\ec4e";
+$icon--brightness-contrast: "\ec4f";
+$icon--contrast2: "\ec50";
+$icon--star6: "\ec51";
+$icon--star7: "\ec52";
+$icon--star8: "\ec53";
+$icon--heart8: "\ec54";
+$icon--heart9: "\ec55";
+$icon--heart-broken: "\ec56";
+$icon--thumbs-up2: "\ec57";
+$icon--thumbs-up3: "\ec58";
+$icon--happy: "\ec59";
+$icon--happy2: "\ec5a";
+$icon--smiley3: "\ec5b";
+$icon--smiley4: "\ec5c";
+$icon--tongue: "\ec5d";
+$icon--tongue2: "\ec5e";
+$icon--sad2: "\ec5f";
+$icon--sad3: "\ec60";
+$icon--wink: "\ec61";
+$icon--wink2: "\ec62";
+$icon--grin: "\ec63";
+$icon--grin2: "\ec64";
+$icon--cool: "\ec65";
+$icon--cool2: "\ec66";
+$icon--angry: "\ec67";
+$icon--angry2: "\ec68";
+$icon--evil: "\ec69";
+$icon--evil2: "\ec6a";
+$icon--shocked: "\ec6b";
+$icon--shocked2: "\ec6c";
+$icon--confused: "\ec6d";
+$icon--confused2: "\ec6e";
+$icon--neutral: "\ec6f";
+$icon--neutral2: "\ec70";
+$icon--wondering: "\ec71";
+$icon--wondering2: "\ec72";
+$icon--point-up: "\ec73";
+$icon--point-right: "\ec74";
+$icon--point-down: "\ec75";
+$icon--point-left: "\ec76";
+$icon--warning4: "\ec77";
+$icon--notification: "\ec78";
+$icon--question3: "\ec79";
+$icon--info6: "\ec7a";
+$icon--info7: "\ec7b";
+$icon--blocked3: "\ec7c";
+$icon--cancel-circle: "\ec7d";
+$icon--checkmark-circle: "\ec7e";
+$icon--spam: "\ec7f";
+$icon--close: "\ec80";
+$icon--checkmark6: "\ec81";
+$icon--checkmark7: "\ec82";
+$icon--spell-check: "\ec83";
+$icon--minus6: "\ec84";
+$icon--plus6: "\ec85";
+$icon--enter2: "\ec86";
+$icon--exit: "\ec87";
+$icon--play4: "\ec88";
+$icon--pause3: "\ec89";
+$icon--stop5: "\ec8a";
+$icon--backward2: "\ec8b";
+$icon--forward5: "\ec8c";
+$icon--play5: "\ec8d";
+$icon--pause4: "\ec8e";
+$icon--stop6: "\ec8f";
+$icon--backward3: "\ec90";
+$icon--forward6: "\ec91";
+$icon--first: "\ec92";
+$icon--last: "\ec93";
+$icon--previous: "\ec94";
+$icon--next: "\ec95";
+$icon--eject2: "\ec96";
+$icon--volume-high: "\ec97";
+$icon--volume-medium: "\ec98";
+$icon--volume-low: "\ec99";
+$icon--volume-mute: "\ec9a";
+$icon--volume-mute2: "\ec9b";
+$icon--volume-increase2: "\ec9c";
+$icon--volume-decrease2: "\ec9d";
+$icon--loop: "\e602";
+$icon--loop4: "\ec9e";
+$icon--loop2: "\e603";
+$icon--shuffle2: "\e604";
+$icon--arrow-up-left: "\ec9f";
+$icon--arrow-up4: "\eca0";
+$icon--arrow-up-right: "\eca1";
+$icon--arrow-right4: "\eca2";
+$icon--arrow-down-right: "\eca3";
+$icon--arrow-down4: "\eca4";
+$icon--arrow-down-left: "\eca5";
+$icon--arrow-left4: "\eca6";
+$icon--arrow-up-left2: "\eca7";
+$icon--arrow-up5: "\eca8";
+$icon--arrow-up-right2: "\eca9";
+$icon--arrow-right5: "\ecaa";
+$icon--arrow-down-right2: "\ecab";
+$icon--arrow-down5: "\ecac";
+$icon--arrow-down-left2: "\ecad";
+$icon--arrow-left5: "\ecae";
+$icon--arrow-up-left3: "\ecaf";
+$icon--arrow-up6: "\ecb0";
+$icon--arrow-up-right3: "\ecb1";
+$icon--arrow-right6: "\ecb2";
+$icon--arrow-down-right3: "\ecb3";
+$icon--arrow-down6: "\ecb4";
+$icon--arrow-down-left3: "\ecb5";
+$icon--arrow-left6: "\ecb6";
+$icon--tab: "\e605";
+$icon--checkbox-checked2: "\ecb7";
+$icon--checkbox-unchecked: "\ecb8";
+$icon--checkbox-partial: "\ecb9";
+$icon--radio-checked: "\ecba";
+$icon--radio-unchecked: "\ecbb";
+$icon--crop5: "\ecbc";
+$icon--scissors2: "\ecbd";
+$icon--filter3: "\ecbe";
+$icon--filter4: "\ecbf";
+$icon--font2: "\ecc0";
+$icon--text-height2: "\ecc1";
+$icon--text-width2: "\ecc2";
+$icon--bold2: "\ecc3";
+$icon--underline2: "\ecc4";
+$icon--italic2: "\ecc5";
+$icon--strikethrough2: "\ecc6";
+$icon--omega: "\ecc7";
+$icon--sigma: "\ecc8";
+$icon--table2: "\ecc9";
+$icon--table3: "\ecca";
+$icon--insert-template: "\eccb";
+$icon--pilcrow: "\eccc";
+$icon--lefttoright: "\eccd";
+$icon--righttoleft: "\ecce";
+$icon--paragraph-left: "\eccf";
+$icon--paragraph-center: "\ecd0";
+$icon--paragraph-right: "\ecd1";
+$icon--paragraph-justify: "\ecd2";
+$icon--paragraph-left2: "\ecd3";
+$icon--paragraph-center2: "\ecd4";
+$icon--paragraph-right2: "\ecd5";
+$icon--paragraph-justify2: "\ecd6";
+$icon--indent-increase: "\ecd7";
+$icon--indent-decrease: "\ecd8";
+$icon--newtab: "\ecd9";
+$icon--embed: "\ecda";
+$icon--code4: "\ecdb";
+$icon--console2: "\ecdc";
+$icon--share2: "\ecdd";
+$icon--mail2: "\ecde";
+$icon--mail3: "\ecdf";
+$icon--mail4: "\ece0";
+$icon--mail5: "\ece1";
+$icon--google2: "\ece2";
+$icon--googleplus: "\ece3";
+$icon--googleplus2: "\ece4";
+$icon--googleplus3: "\ece5";
+$icon--googleplus4: "\ece6";
+$icon--google-drive: "\ece7";
+$icon--facebook2: "\ece8";
+$icon--facebook3: "\ece9";
+$icon--facebook4: "\ecea";
+$icon--instagram2: "\eceb";
+$icon--twitter3: "\ecec";
+$icon--twitter4: "\eced";
+$icon--twitter5: "\ecee";
+$icon--feed3: "\ecef";
+$icon--feed4: "\ecf0";
+$icon--feed5: "\ecf1";
+$icon--youtube2: "\ecf2";
+$icon--youtube3: "\ecf3";
+$icon--vimeo: "\ecf4";
+$icon--vimeo2: "\ecf5";
+$icon--vimeo3: "\ecf6";
+$icon--lanyrd: "\ecf7";
+$icon--flickr2: "\ecf8";
+$icon--flickr3: "\ecf9";
+$icon--flickr4: "\ecfa";
+$icon--flickr5: "\ecfb";
+$icon--picassa: "\ecfc";
+$icon--picassa2: "\ecfd";
+$icon--dribbble3: "\ecfe";
+$icon--dribbble4: "\ecff";
+$icon--dribbble5: "\ed00";
+$icon--forrst2: "\ed01";
+$icon--forrst3: "\ed02";
+$icon--deviantart2: "\ed03";
+$icon--deviantart3: "\ed04";
+$icon--steam2: "\ed05";
+$icon--steam3: "\ed06";
+$icon--github2: "\ed07";
+$icon--github3: "\ed08";
+$icon--github4: "\ed09";
+$icon--github5: "\ed0a";
+$icon--github6: "\ed0b";
+$icon--wordpress2: "\ed0c";
+$icon--wordpress3: "\ed0d";
+$icon--joomla2: "\ed0e";
+$icon--blogger: "\ed0f";
+$icon--blogger2: "\ed10";
+$icon--tumblr2: "\ed11";
+$icon--tumblr3: "\ed12";
+$icon--yahoo2: "\ed13";
+$icon--tux: "\ed14";
+$icon--apple3: "\ed15";
+$icon--finder: "\ed16";
+$icon--android3: "\ed17";
+$icon--windows3: "\ed18";
+$icon--windows8: "\ed19";
+$icon--soundcloud2: "\ed1a";
+$icon--soundcloud3: "\ed1b";
+$icon--skype3: "\ed1c";
+$icon--reddit2: "\ed1d";
+$icon--linkedin2: "\ed1e";
+$icon--lastfm: "\ed1f";
+$icon--lastfm2: "\ed20";
+$icon--delicious2: "\ed21";
+$icon--stumbleupon2: "\ed22";
+$icon--stumbleupon3: "\ed23";
+$icon--stackoverflow: "\ed24";
+$icon--pinterest2: "\ed25";
+$icon--pinterest3: "\ed26";
+$icon--xing2: "\ed27";
+$icon--xing3: "\ed28";
+$icon--flattr: "\ed29";
+$icon--foursquare2: "\ed2a";
+$icon--foursquare3: "\ed2b";
+$icon--paypal: "\ed2c";
+$icon--paypal2: "\ed2d";
+$icon--paypal3: "\ed2e";
+$icon--yelp: "\ed2f";
+$icon--libreoffice: "\ed30";
+$icon--file-pdf2: "\ed31";
+$icon--file-openoffice: "\ed32";
+$icon--file-word: "\ed33";
+$icon--file-excel: "\ed34";
+$icon--file-zip2: "\ed35";
+$icon--file-powerpoint: "\ed36";
+$icon--file-xml: "\ed37";
+$icon--file-css: "\ed38";
+$icon--html52: "\ed39";
+$icon--html53: "\ed3a";
+$icon--css32: "\ed3b";
+$icon--chrome: "\ed3c";
+$icon--firefox: "\ed3d";
+$icon--IE: "\ed3e";
+$icon--opera: "\ed3f";
+$icon--safari: "\ed40";
+$icon--IcoMoon: "\ed41";
+
+
+
+$icon--flag-css-path: '../fonts/flag-icon' !default;
+$icon--flag-rect-path: '/4x3' !default;
+$icon--flag-square-path: '/1x1' !default;
+
+
+
+$font-size-base: 1rem !default; // Assumes the browser default, typically `16px`
+$font-size-lg:   1.25rem !default;
+$font-size-sm:   0.875rem !default;
+$font-size-xs:   0.75rem !default;
+
+$font-weight-normal: normal !default;
+$font-weight-bold: bold !default;
+
+$font-weight-base: $font-weight-normal !default;
+$line-height-base: 1.5 !default;
+
+$font-size-h1: 2.5rem !default;
+$font-size-h2: 2rem !default;
+$font-size-h3: 1.75rem !default;
+$font-size-h4: 1.5rem !default;
+$font-size-h5: 1.25rem !default;
+$font-size-h6: 1rem !default;
+
+$headings-margin-bottom: ($spacer / 2) !default;
+$headings-line-height:   1.1 !default;
+
+$display1-size: 6rem !default;
+$display2-size: 5.5rem !default;
+$display3-size: 4.5rem !default;
+$display4-size: 3.5rem !default;
+
+$display1-weight:     300 !default;
+$display2-weight:     300 !default;
+$display3-weight:     300 !default;
+$display4-weight:     300 !default;
+$display-line-height: $headings-line-height !default;
+
+$lead-font-size:   1.25rem !default;
+$lead-font-weight: 300 !default;
+
+$small-font-size: 80% !default;
+
+$text-muted: $gray-light !default;
+
+$abbr-border-color: $gray-light !default;
+
+$blockquote-small-color:  $gray-light !default;
+$blockquote-font-size:    ($font-size-base * 1.25) !default;
+$blockquote-border-color: $gray-lighter !default;
+$blockquote-border-width: .25rem !default;
+
+$hr-border-color: rgba($black,.1) !default;
+$hr-border-width: $border-width !default;
+
+$mark-padding: .2em !default;
+
+$dt-font-weight: $font-weight-bold !default;
+
+$kbd-box-shadow:         inset 0 -.1rem 0 rgba($black,.25) !default;
+$nested-kbd-font-weight: $font-weight-bold !default;
+
+$list-inline-padding: 5px !default;
+
+
+// Components
+//
+// Define common padding and border radius sizes and more.
+
+$line-height-lg:         (4 / 3) !default;
+$line-height-sm:         1.5 !default;
+
+$border-radius:          .25rem !default;
+$border-radius-lg:       .3rem !default;
+$border-radius-sm:       .2rem !default;
+
+$component-active-color: $white !default;
+$component-active-bg:    $brand-primary !default;
+
+$caret-width:            .3em !default;
+
+$transition-base:        all .2s ease-in-out !default;
+$transition-fade:        opacity .15s linear !default;
+$transition-collapse:    height .35s ease !default;
+
+
+// Tables
+//
+// Customizes the `.table` component with basic values, each used across all table variations.
+
+$table-cell-padding:            .75rem !default;
+$table-sm-cell-padding:         .3rem !default;
+
+$table-bg:                      transparent !default;
+
+$table-inverse-bg:              $gray-dark !default;
+$table-inverse-color:           $body-bg !default;
+
+$table-bg-accent:               rgba($black,.05) !default;
+$table-bg-hover:                rgba($black,.075) !default;
+$table-bg-active:               $table-bg-hover !default;
+
+$table-head-bg:                 $gray-lighter !default;
+$table-head-color:              $gray !default;
+
+$table-border-width:            $border-width !default;
+$table-border-color:            $gray-lighter !default;
+
+
+// Buttons
+//
+// For each of Bootstrap's buttons, define text, background and border color.
+
+$btn-padding-x:                  1rem !default;
+$btn-padding-y:                  .5rem !default;
+$btn-line-height:                1.25 !default;
+$btn-font-weight:                $font-weight-normal !default;
+$btn-box-shadow:                 inset 0 1px 0 rgba($white,.15), 0 1px 1px rgba($black,.075) !default;
+$btn-focus-box-shadow:           0 0 0 2px rgba($brand-primary, .25) !default;
+$btn-active-box-shadow:          inset 0 3px 5px rgba($black,.125) !default;
+
+$btn-primary-color:              $white !default;
+$btn-primary-bg:                 $brand-primary !default;
+$btn-primary-border:             $btn-primary-bg !default;
+
+$btn-secondary-color:            $gray-dark !default;
+$btn-secondary-bg:               $white !default;
+$btn-secondary-border:           #ccc !default;
+
+$btn-info-color:                 $white !default;
+$btn-info-bg:                    $brand-info !default;
+$btn-info-border:                $btn-info-bg !default;
+
+$btn-success-color:              $white !default;
+$btn-success-bg:                 $brand-success !default;
+$btn-success-border:             $btn-success-bg !default;
+
+$btn-warning-color:              $white !default;
+$btn-warning-bg:                 $brand-warning !default;
+$btn-warning-border:             $btn-warning-bg !default;
+
+$btn-danger-color:               $white !default;
+$btn-danger-bg:                  $brand-danger !default;
+$btn-danger-border:              $btn-danger-bg !default;
+
+$btn-link-disabled-color:        $gray-light !default;
+
+$btn-padding-x-sm:               .5rem !default;
+$btn-padding-y-sm:               .25rem !default;
+
+$btn-padding-x-lg:               1.5rem !default;
+$btn-padding-y-lg:               .75rem !default;
+
+$btn-block-spacing-y:            .5rem !default;
+$btn-toolbar-margin:             .5rem !default;
+
+// Allows for customizing button radius independently from global border radius
+$btn-border-radius:              $border-radius !default;
+$btn-border-radius-lg:           $border-radius-lg !default;
+$btn-border-radius-sm:           $border-radius-sm !default;
+
+$btn-transition:                 all .2s ease-in-out !default;
+
+
+// Forms
+
+$input-padding-x:                .75rem !default;
+$input-padding-y:                .5rem !default;
+$input-line-height:              1.25 !default;
+
+$input-bg:                       $white !default;
+$input-bg-disabled:              $gray-lighter !default;
+
+$input-color:                    $gray !default;
+$input-border-color:             rgba($black,.15) !default;
+$input-btn-border-width:         $border-width !default; // For form controls and buttons
+$input-box-shadow:               inset 0 1px 1px rgba($black,.075) !default;
+
+$input-border-radius:            $border-radius !default;
+$input-border-radius-lg:         $border-radius-lg !default;
+$input-border-radius-sm:         $border-radius-sm !default;
+
+$input-bg-focus:                 $input-bg !default;
+$input-border-focus:             lighten($brand-primary, 25%) !default;
+$input-box-shadow-focus:         $input-box-shadow, rgba($input-border-focus, .6) !default;
+$input-color-focus:              $input-color !default;
+
+$input-color-placeholder:        $gray-light !default;
+
+$input-padding-x-sm:             .5rem !default;
+$input-padding-y-sm:             .25rem !default;
+
+$input-padding-x-lg:             1.5rem !default;
+$input-padding-y-lg:             .75rem !default;
+
+$input-height:                   (($font-size-base * $input-line-height) + ($input-padding-y * 2)) !default;
+$input-height-lg:                (($font-size-lg * $line-height-lg) + ($input-padding-y-lg * 2)) !default;
+$input-height-sm:                (($font-size-sm * $line-height-sm) + ($input-padding-y-sm * 2)) !default;
+
+$input-transition:               border-color ease-in-out .15s, box-shadow ease-in-out .15s !default;
+
+$form-text-margin-top:     .25rem !default;
+$form-feedback-margin-top: $form-text-margin-top !default;
+
+$form-check-margin-bottom:  .5rem !default;
+$form-check-input-gutter:   1.25rem !default;
+$form-check-input-margin-y: .25rem !default;
+$form-check-input-margin-x: .25rem !default;
+
+$form-check-inline-margin-x: .75rem !default;
+
+$form-group-margin-bottom:       $spacer-y !default;
+
+$input-group-addon-bg:           $gray-lighter !default;
+$input-group-addon-border-color: $input-border-color !default;
+
+$cursor-disabled:                not-allowed !default;
+
+$custom-control-gutter:   1.5rem !default;
+$custom-control-spacer-x: 1rem !default;
+$custom-control-spacer-y: .25rem !default;
+
+$custom-control-indicator-size:       1rem !default;
+$custom-control-indicator-margin-y:   (($line-height-base * 1rem) - $custom-control-indicator-size) / -2 !default;
+$custom-control-indicator-bg:         #ddd !default;
+$custom-control-indicator-bg-size:    50% 50% !default;
+$custom-control-indicator-box-shadow: inset 0 .25rem .25rem rgba($black,.1) !default;
+
+$custom-control-disabled-cursor:             $cursor-disabled !default;
+$custom-control-disabled-indicator-bg:       $gray-lighter !default;
+$custom-control-disabled-description-color:  $gray-light !default;
+
+$custom-control-checked-indicator-color:      $white !default;
+$custom-control-checked-indicator-bg:         $brand-primary !default;
+$custom-control-checked-indicator-box-shadow: none !default;
+
+$custom-control-focus-indicator-box-shadow: 0 0 0 1px $body-bg, 0 0 0 3px $brand-primary !default;
+
+$custom-control-active-indicator-color:      $white !default;
+$custom-control-active-indicator-bg:         lighten($brand-primary, 35%) !default;
+$custom-control-active-indicator-box-shadow: none !default;
+
+$custom-checkbox-radius: $border-radius !default;
+$custom-checkbox-checked-icon: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='#{$custom-control-checked-indicator-color}' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+$custom-checkbox-indeterminate-bg: $brand-primary !default;
+$custom-checkbox-indeterminate-indicator-color: $custom-control-checked-indicator-color !default;
+$custom-checkbox-indeterminate-icon: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'%3E%3Cpath stroke='#{$custom-checkbox-indeterminate-indicator-color}' d='M0 2h4'/%3E%3C/svg%3E"), "#", "%23") !default;
+$custom-checkbox-indeterminate-box-shadow: none !default;
+
+$custom-radio-radius: 50% !default;
+$custom-radio-checked-icon: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3E%3Ccircle r='3' fill='#{$custom-control-checked-indicator-color}'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+$custom-select-padding-x:          .75rem  !default;
+$custom-select-padding-y:          .375rem !default;
+$custom-select-indicator-padding:   1rem !default; // Extra padding to account for the presence of the background-image based indicator
+$custom-select-line-height:         $input-line-height !default;
+$custom-select-color:               $input-color !default;
+$custom-select-disabled-color:      $gray-light !default;
+$custom-select-bg:            $white !default;
+$custom-select-disabled-bg:   $gray-lighter !default;
+$custom-select-bg-size:       8px 10px !default; // In pixels because image dimensions
+$custom-select-indicator-color: #333 !default;
+$custom-select-indicator:     str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='#{$custom-select-indicator-color}' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$custom-select-border-width:  $input-btn-border-width !default;
+$custom-select-border-color:  $input-border-color !default;
+$custom-select-border-radius: $border-radius !default;
+
+$custom-select-focus-border-color: lighten($brand-primary, 25%) !default;
+$custom-select-focus-box-shadow:   inset 0 1px 2px rgba($black, .075), 0 0 5px rgba($custom-select-focus-border-color, .5) !default;
+
+$custom-select-sm-padding-y:  .2rem !default;
+$custom-select-sm-font-size:  75% !default;
+
+$custom-file-height:           2.5rem !default;
+$custom-file-width:            14rem !default;
+$custom-file-focus-box-shadow: 0 0 0 .075rem $white, 0 0 0 .2rem $brand-primary !default;
+
+$custom-file-padding-x:     .5rem !default;
+$custom-file-padding-y:     1rem !default;
+$custom-file-line-height:   1.5 !default;
+$custom-file-color:         $gray !default;
+$custom-file-bg:            $white !default;
+$custom-file-border-width:  $border-width !default;
+$custom-file-border-color:  $input-border-color !default;
+$custom-file-border-radius: $border-radius !default;
+$custom-file-box-shadow:    inset 0 .2rem .4rem rgba($black,.05) !default;
+$custom-file-button-color:  $custom-file-color !default;
+$custom-file-button-bg:     $gray-lighter !default;
+$custom-file-text: (
+	placeholder: (
+		en: "Choose file..."
+	),
+	button-label: (
+		en: "Browse"
+	)
+) !default;
+
+
+// Form validation icons
+$form-icon-success-color: $brand-success !default;
+$form-icon-success: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='#{$form-icon-success-color}' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+$form-icon-warning-color: $brand-warning !default;
+$form-icon-warning: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='#{$form-icon-warning-color}' d='M4.4 5.324h-.8v-2.46h.8zm0 1.42h-.8V5.89h.8zM3.76.63L.04 7.075c-.115.2.016.425.26.426h7.397c.242 0 .372-.226.258-.426C6.726 4.924 5.47 2.79 4.253.63c-.113-.174-.39-.174-.494 0z'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+$form-icon-danger-color: $brand-danger !default;
+$form-icon-danger: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='#{$form-icon-danger-color}' viewBox='-2 -2 7 7'%3E%3Cpath stroke='%23d9534f' d='M0 0l3 3m0-3L0 3'/%3E%3Ccircle r='.5'/%3E%3Ccircle cx='3' r='.5'/%3E%3Ccircle cy='3' r='.5'/%3E%3Ccircle cx='3' cy='3' r='.5'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+
+// Dropdowns
+//
+// Dropdown menu container and contents.
+
+$dropdown-min-width:             10rem !default;
+$dropdown-padding-y:             .5rem !default;
+$dropdown-margin-top:            .125rem !default;
+$dropdown-bg:                    $white !default;
+$dropdown-border-color:          rgba($black,.15) !default;
+$dropdown-border-width:          $border-width !default;
+$dropdown-divider-bg:            $gray-lighter !default;
+$dropdown-box-shadow:            0 .5rem 1rem rgba($black,.175) !default;
+
+$dropdown-link-color:            $gray-dark !default;
+$dropdown-link-hover-color:      darken($gray-dark, 5%) !default;
+$dropdown-link-hover-bg:         $gray-lightest !default;
+
+$dropdown-link-active-color:     $component-active-color !default;
+$dropdown-link-active-bg:        $component-active-bg !default;
+
+$dropdown-link-disabled-color:   $gray-light !default;
+
+$dropdown-item-padding-x:        1.5rem !default;
+
+$dropdown-header-color:          $gray-light !default;
+
+
+// Z-index master list
+//
+// Warning: Avoid customizing these values. They're used for a bird's eye view
+// of components dependent on the z-axis and are designed to all work together.
+
+$zindex-dropdown-backdrop:  990 !default;
+$zindex-navbar:             1000 !default;
+$zindex-dropdown:           1000 !default;
+$zindex-fixed:              1030 !default;
+$zindex-sticky:             1030 !default;
+$zindex-modal-backdrop:     1040 !default;
+$zindex-modal:              1050 !default;
+$zindex-popover:            1060 !default;
+$zindex-tooltip:            1070 !default;
+
+
+// Navbar
+
+$navbar-border-radius:              $border-radius !default;
+$navbar-padding-x:                  $spacer !default;
+$navbar-padding-y:                  ($spacer / 2) !default;
+
+$navbar-brand-padding-y:            .25rem !default;
+
+$navbar-toggler-padding-x:           .75rem !default;
+$navbar-toggler-padding-y:           .25rem !default;
+$navbar-toggler-font-size:           $font-size-lg !default;
+$navbar-toggler-border-radius:       $btn-border-radius !default;
+
+$navbar-inverse-color:                 rgba($white,.5) !default;
+$navbar-inverse-hover-color:           rgba($white,.75) !default;
+$navbar-inverse-active-color:          rgba($white,1) !default;
+$navbar-inverse-disabled-color:        rgba($white,.25) !default;
+$navbar-inverse-toggler-bg: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$navbar-inverse-color}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E"), "#", "%23") !default;
+$navbar-inverse-toggler-border:        rgba($white,.1) !default;
+
+$navbar-light-color:                rgba($black,.5) !default;
+$navbar-light-hover-color:          rgba($black,.7) !default;
+$navbar-light-active-color:         rgba($black,.9) !default;
+$navbar-light-disabled-color:       rgba($black,.3) !default;
+$navbar-light-toggler-bg: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$navbar-light-color}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E"), "#", "%23") !default;
+$navbar-light-toggler-border:       rgba($black,.1) !default;
+
+// Navs
+
+$nav-item-margin:               .2rem !default;
+$nav-item-inline-spacer:        1rem !default;
+$nav-link-padding:              .5em 1em !default;
+$nav-link-hover-bg:             $gray-lighter !default;
+$nav-disabled-link-color:       $gray-light !default;
+
+$nav-tabs-border-color:                       #ddd !default;
+$nav-tabs-border-width:                       $border-width !default;
+$nav-tabs-border-radius:                      $border-radius !default;
+$nav-tabs-link-hover-border-color:            $gray-lighter !default;
+$nav-tabs-active-link-hover-color:            $gray !default;
+$nav-tabs-active-link-hover-bg:               $body-bg !default;
+$nav-tabs-active-link-hover-border-color:     #ddd !default;
+$nav-tabs-justified-link-border-color:        #ddd !default;
+$nav-tabs-justified-active-link-border-color: $body-bg !default;
+
+$nav-pills-border-radius:     $border-radius !default;
+$nav-pills-active-link-color: $component-active-color !default;
+$nav-pills-active-link-bg:    $component-active-bg !default;
+
+
+// Pagination
+
+$pagination-padding-x:                .75rem !default;
+$pagination-padding-y:                .5rem !default;
+$pagination-padding-x-sm:             .5rem !default;
+$pagination-padding-y-sm:             .25rem !default;
+$pagination-padding-x-lg:             1.5rem !default;
+$pagination-padding-y-lg:             .75rem !default;
+$pagination-line-height:              1.25 !default;
+
+$pagination-color:                     $link-color !default;
+$pagination-bg:                        $white !default;
+$pagination-border-width:              $border-width !default;
+$pagination-border-color:              #ddd !default;
+
+$pagination-hover-color:               $link-hover-color !default;
+$pagination-hover-bg:                  $gray-lighter !default;
+$pagination-hover-border:              #ddd !default;
+
+$pagination-active-color:              $white !default;
+$pagination-active-bg:                 $brand-primary !default;
+$pagination-active-border:             $brand-primary !default;
+
+$pagination-disabled-color:            $gray-light !default;
+$pagination-disabled-bg:               $white !default;
+$pagination-disabled-border:           #ddd !default;
+
+
+// Jumbotron
+
+$jumbotron-padding:              2rem !default;
+$jumbotron-bg:                   $gray-lighter !default;
+
+
+// Form states and alerts
+//
+// Define colors for form feedback states and, by default, alerts.
+
+$state-success-text:             #3c763d !default;
+$state-success-bg:               #dff0d8 !default;
+$state-success-border:           darken($state-success-bg, 5%) !default;
+
+$state-info-text:                #31708f !default;
+$state-info-bg:                  #d9edf7 !default;
+$state-info-border:              darken($state-info-bg, 7%) !default;
+
+$state-warning-text:             #8a6d3b !default;
+$state-warning-bg:               #fcf8e3 !default;
+$mark-bg:                        $state-warning-bg !default;
+$state-warning-border:           darken($state-warning-bg, 5%) !default;
+
+$state-danger-text:              #a94442 !default;
+$state-danger-bg:                #f2dede !default;
+$state-danger-border:            darken($state-danger-bg, 5%) !default;
+
+
+// Cards
+
+$card-spacer-x:            1.25rem !default;
+$card-spacer-y:            .75rem !default;
+$card-border-width:        1px !default;
+$card-border-radius:       $border-radius !default;
+$card-border-color:        rgba($black,.125) !default;
+$card-border-radius-inner: calc(#{$card-border-radius} - #{$card-border-width}) !default;
+$card-cap-bg:              $gray-lightest !default;
+$card-bg:                  $white !default;
+
+$card-link-hover-color:    $white !default;
+
+$card-img-overlay-padding: 1.25rem !default;
+
+$card-deck-margin:          ($grid-gutter-width-base / 2) !default;
+
+$card-columns-count:        3 !default;
+$card-columns-gap:          1.25rem !default;
+$card-columns-margin:       $card-spacer-y !default;
+
+
+// Tooltips
+
+$tooltip-max-width:           200px !default;
+$tooltip-color:               $white !default;
+$tooltip-bg:                  $black !default;
+$tooltip-opacity:             .9 !default;
+$tooltip-padding-y:           3px !default;
+$tooltip-padding-x:           8px !default;
+$tooltip-margin:              3px !default;
+
+$tooltip-arrow-width:         5px !default;
+$tooltip-arrow-color:         $tooltip-bg !default;
+
+
+// Popovers
+
+$popover-inner-padding:               1px !default;
+$popover-bg:                          $white !default;
+$popover-max-width:                   276px !default;
+$popover-border-width:                $border-width !default;
+$popover-border-color:                rgba($black,.2) !default;
+$popover-box-shadow:                  0 5px 10px rgba($black,.2) !default;
+
+$popover-title-bg:                    darken($popover-bg, 3%) !default;
+$popover-title-padding-x:             14px !default;
+$popover-title-padding-y:             8px !default;
+
+$popover-content-padding-x:           14px !default;
+$popover-content-padding-y:           9px !default;
+
+$popover-arrow-width:                 10px !default;
+$popover-arrow-color:                 $popover-bg !default;
+
+$popover-arrow-outer-width:           ($popover-arrow-width + 1px) !default;
+$popover-arrow-outer-color:           fade-in($popover-border-color, .05) !default;
+
+
+// Badges
+
+$badge-default-bg:            $gray-light !default;
+$badge-primary-bg:            $brand-primary !default;
+$badge-success-bg:            $brand-success !default;
+$badge-info-bg:               $brand-info !default;
+$badge-warning-bg:            $brand-warning !default;
+$badge-danger-bg:             $brand-danger !default;
+
+$badge-color:                 $white !default;
+$badge-link-hover-color:      $white !default;
+$badge-font-size:             75% !default;
+$badge-font-weight:           $font-weight-bold !default;
+$badge-padding-x:             .4em !default;
+$badge-padding-y:             .25em !default;
+
+$badge-pill-padding-x:        .6em !default;
+// Use a higher than normal value to ensure completely rounded edges when
+// customizing padding or font-size on labels.
+$badge-pill-border-radius:    10rem !default;
+
+
+// Modals
+
+// Padding applied to the modal body
+$modal-inner-padding:         15px !default;
+
+$modal-dialog-margin:         10px !default;
+$modal-dialog-sm-up-margin-y: 30px !default;
+
+$modal-title-line-height:     $line-height-base !default;
+
+$modal-content-bg:               $white !default;
+$modal-content-border-color:     rgba($black,.2) !default;
+$modal-content-border-width:     $border-width !default;
+$modal-content-xs-box-shadow:    0 3px 9px rgba($black,.5) !default;
+$modal-content-sm-up-box-shadow: 0 5px 15px rgba($black,.5) !default;
+
+$modal-backdrop-bg:           $black !default;
+$modal-backdrop-opacity:      .5 !default;
+$modal-header-border-color:   $gray-lighter !default;
+$modal-footer-border-color:   $modal-header-border-color !default;
+$modal-header-border-width:   $modal-content-border-width !default;
+$modal-footer-border-width:   $modal-header-border-width !default;
+$modal-header-padding:        15px !default;
+
+$modal-lg:                    800px !default;
+$modal-md:                    500px !default;
+$modal-sm:                    300px !default;
+
+$modal-transition:            transform .3s ease-out !default;
+
+
+// Alerts
+//
+// Define alert colors, border radius, and padding.
+
+$alert-padding-x:             1.25rem !default;
+$alert-padding-y:             .75rem !default;
+$alert-margin-bottom:         $spacer-y !default;
+$alert-border-radius:         $border-radius !default;
+$alert-link-font-weight:      $font-weight-bold !default;
+$alert-border-width:          $border-width !default;
+
+$alert-success-bg:            $state-success-bg !default;
+$alert-success-text:          $state-success-text !default;
+$alert-success-border:        $state-success-border !default;
+
+$alert-info-bg:               $state-info-bg !default;
+$alert-info-text:             $state-info-text !default;
+$alert-info-border:           $state-info-border !default;
+
+$alert-warning-bg:            $state-warning-bg !default;
+$alert-warning-text:          $state-warning-text !default;
+$alert-warning-border:        $state-warning-border !default;
+
+$alert-danger-bg:             $state-danger-bg !default;
+$alert-danger-text:           $state-danger-text !default;
+$alert-danger-border:         $state-danger-border !default;
+
+
+// Progress bars
+
+$progress-height:               1rem !default;
+$progress-font-size:            .75rem !default;
+$progress-bg:                   $gray-lighter !default;
+$progress-border-radius:        $border-radius !default;
+$progress-box-shadow:           inset 0 .1rem .1rem rgba($black,.1) !default;
+$progress-bar-color:            $white !default;
+$progress-bar-bg:               $brand-primary !default;
+$progress-bar-animation-timing: 1s linear infinite !default;
+
+// List group
+
+$list-group-color:               $body-color !default;
+$list-group-bg:                  $white !default;
+$list-group-border-color:        rgba($black,.125) !default;
+$list-group-border-width:        $border-width !default;
+$list-group-border-radius:       $border-radius !default;
+
+$list-group-item-padding-x:      1.25rem !default;
+$list-group-item-padding-y:      .75rem !default;
+
+$list-group-hover-bg:            $gray-lightest !default;
+$list-group-active-color:        $component-active-color !default;
+$list-group-active-bg:           $component-active-bg !default;
+$list-group-active-border:       $list-group-active-bg !default;
+$list-group-active-text-color:   lighten($list-group-active-bg, 50%) !default;
+
+$list-group-disabled-color:      $gray-light !default;
+$list-group-disabled-bg:         $list-group-bg !default;
+$list-group-disabled-text-color: $list-group-disabled-color !default;
+
+$list-group-link-color:          $gray !default;
+$list-group-link-heading-color:  $gray-dark !default;
+$list-group-link-hover-color:    $list-group-link-color !default;
+
+$list-group-link-active-color:   $list-group-color !default;
+$list-group-link-active-bg:      $gray-lighter !default;
+
+
+// Image thumbnails
+
+$thumbnail-padding:           .25rem !default;
+$thumbnail-bg:                $body-bg !default;
+$thumbnail-border-width:      $border-width !default;
+$thumbnail-border-color:      #ddd !default;
+$thumbnail-border-radius:     $border-radius !default;
+$thumbnail-box-shadow:        0 1px 2px rgba($black,.075) !default;
+$thumbnail-transition:        all .2s ease-in-out !default;
+
+
+// Figures
+
+$figure-caption-font-size: 90% !default;
+$figure-caption-color:     $gray-light !default;
+
+
+// Breadcrumbs
+
+$breadcrumb-padding-y:          .75rem !default;
+$breadcrumb-padding-x:          1rem !default;
+$breadcrumb-item-padding:       .5rem !default;
+
+$breadcrumb-bg:                 $gray-lighter !default;
+$breadcrumb-divider-color:      $gray-light !default;
+$breadcrumb-active-color:       $gray-light !default;
+$breadcrumb-divider:            "/" !default;
+
+
+// Carousel
+
+$carousel-control-color:                      $white !default;
+$carousel-control-width:                      15% !default;
+$carousel-control-opacity:                    .5 !default;
+
+$carousel-indicator-width:                    30px !default;
+$carousel-indicator-height:                   3px !default;
+$carousel-indicator-spacer:                   3px !default;
+$carousel-indicator-active-bg:                $white !default;
+
+$carousel-caption-width:                      70% !default;
+$carousel-caption-color:                      $white !default;
+
+$carousel-control-icon-width:                 20px !default;
+
+$carousel-control-prev-icon-bg: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='#{$carousel-control-color}' viewBox='0 0 8 8'%3E%3Cpath d='M4 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$carousel-control-next-icon-bg: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='#{$carousel-control-color}' viewBox='0 0 8 8'%3E%3Cpath d='M1.5 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+$carousel-transition:           transform .6s ease-in-out !default;
+
+
+// Close
+
+$close-font-size:             $font-size-base * 1.5 !default;
+$close-font-weight:           $font-weight-bold !default;
+$close-color:                 $black !default;
+$close-text-shadow:           0 1px 0 $white !default;
+
+
+// Code
+
+$code-font-size:              90% !default;
+$code-padding-x:              .4rem !default;
+$code-padding-y:              .2rem !default;
+$code-color:                  #bd4147 !default;
+$code-bg:                     $gray-lightest !default;
+
+$kbd-color:                   $white !default;
+$kbd-bg:                      $gray-dark !default;
+
+$pre-bg:                      $gray-lightest !default;
+$pre-color:                   $gray-dark !default;
+$pre-border-color:            #ccc !default;
+$pre-scrollable-max-height:   340px !default;
