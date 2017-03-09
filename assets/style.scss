@@ -1,2 +1,23 @@
-@import "./src/globals/scss/base";
+//
+// Core variables and mixins
+//
+@import "./src/globals/scss/variables";
+@import "./src/globals/scss/mixins";
+
+//
+// Base files
+//
 @import "./src/globals/scss/fonts";
+@import "./src/globals/scss/base";
+
+//
+// Core SCSS
+//
+@import "./src/globals/scss/type";
+@import "./src/globals/scss/images";
+@import "./src/globals/scss/code";
+@import "./src/globals/scss/grid";
+// @import "./src/globals/scss/tables";
+// @import "./src/globals/scss/forms";
+// @import "./src/globals/scss/buttons";
+
