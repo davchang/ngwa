@@ -3,19 +3,20 @@ Let's get this party re-booted...
 ******************************************************************************/
 
 html {
-	color: cv(deep-purple,light-1);	
-	box-sizing: border-box;
-	font-family: sans-serif;
-	line-height: $line-height-base;
-	-ms-overflow-style: scrollbar;
-	-webkit-tap-highlight-color: rgba(0,0,0,0);
-	-ms-text-size-adjust: 100%;
-	-webkit-text-size-adjust: 100%;
 	@include media-breakpoint-up(xs) { font-size: 11px; }
 	@include media-breakpoint-up(sm) { font-size: 12px; }
 	@include media-breakpoint-up(md) { font-size: 16px; }
 	@include media-breakpoint-up(lg) { font-size: 18px; }
 	@include media-breakpoint-up(xl) { font-size: 22px; }
+	box-sizing: border-box;
+	color: $body-color;
+	font-family: $font--base;
+	line-height: $line-height--base;
+	-ms-overflow-style: scrollbar;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+
 }
 
 *,
@@ -32,14 +33,15 @@ body {
 	background-color: $body-bg;
 	color: $body-color;
 	font-family: $font--base;
-	font-size: $font-size-base;
-	font-weight: $font-weight-base;
-	line-height: $line-height-base;
+	font-size: $font-size--base;
+	font-weight: $font-weight--base;
+	line-height: $line-height--base;
 	margin: 0;
+	padding: 0;
 }
 
 /******************************************************************************
-Now let's take care of the lower-level stuff
+Lower-level stuff & things
 ******************************************************************************/
 
 ::-webkit-file-upload-button {
@@ -86,9 +88,7 @@ a {
 	}
 
 	&:active,
-	&:hover {
-		outline-width: 0;
-	}
+	&:hover { outline-width: 0;	}
 }
 
 a:not([href]):not([tabindex]) {
@@ -100,9 +100,7 @@ a:not([href]):not([tabindex]) {
 		text-decoration: none;
 	}
 
-	&:focus {
-		outline: 0;
-	}
+	&:focus { outline: 0; }
 }
 
 abbr[title],
@@ -142,8 +140,8 @@ button {
 	box-shadow: none;
 	cursor: pointer;
 	font-family: $font--base;
-	font-size: $font-size-base;
-	line-height: $line-height-base; 
+	font-size: $font-size--base;
+	line-height: $line-height--base; 
 	margin: 0;
 	outline: none;
 	overflow: visible;
@@ -151,8 +149,7 @@ button {
 	touch-action: manipulation;
 
 	&:focus {
-		outline: 1px dotted;
-		outline: 5px auto -webkit-focus-ring-color;
+		outline: none;
 	}
 }
 
@@ -172,7 +169,7 @@ button::-moz-focus-inner,
 button:-moz-focusring,
 [type="button"]:-moz-focusring,
 [type="reset"]:-moz-focusring,
-[type="submit"]:-moz-focusring { outline: 1px dotted ButtonText; }
+[type="submit"]:-moz-focusring { outline: none; }
 
 canvas { display: inline-block; }
 
@@ -186,7 +183,7 @@ caption {
 
 code {
 	font-family: $font--monospace;
-	font-size: $font-size-base;
+	font-size: $font-size--base;
 }
 
 details { display: block; }
@@ -244,15 +241,10 @@ img {
 }
 
 input {
-	line-height: $line-height-base;
+	line-height: $line-height--base;
 	overflow: visible;
 	touch-action: manipulation;
 }
-
-
-
-
-
 
 input[type="radio"],
 input[type="checkbox"] {
@@ -272,15 +264,9 @@ input[type="search"] {
 	-webkit-appearance: none;
 }
 
-
-
-
-
-
-
 kbd {
 	font-family: $font--monospace;
-	font-size: $font-size-base;
+	font-size: $font-size--base;
 }
 
 label { touch-action: manipulation; }
@@ -309,7 +295,7 @@ label {
 legend {
 	display: block;
 	font-size: 1.5rem;
-	line-height: $line-height-base;
+	line-height: $line-height--base;
 	margin-bottom: 0.5rem;
 	padding: 0;
 	width: 100%;
@@ -324,20 +310,19 @@ menu { display: block; }
 
 optgroup {
 	font-family: $font--base;
-	font-size: $font-size-base;
-	line-height: $line-height-base; 
+	font-size: $font-size--base;
+	line-height: $line-height--base; 
 	margin: 0;
 }
 
 //
-// todo: needed?
-// Output tag is unsupported in IE/Edge?
+// Not sure if needed: Output tag is unsupported in IE/Edge?
 //
 output {
+	color: $input-color;
 	display: inline-block;
-//  font-size: $font-size-base;
-//  line-height: $line-height-base;
-//  color: $input-color;
+	font-size: $font-size--base;
+	line-height: $line-height--base;
 }
 
 p {
@@ -360,15 +345,15 @@ progress {
 
 samp {
 	font-family: $font--monospace;
-	font-size: $font-size-base;
+	font-size: $font-size--base;
 }
 
 section { display: block; }
 
 select {
 	font-family: $font--base;
-	font-size: $font-size-base;
-	line-height: $line-height-base; 
+	font-size: $font-size--base;
+	line-height: $line-height--base; 
 	margin: 0;
 	text-transform: none;
 	touch-action: manipulation;
@@ -406,8 +391,8 @@ template { display: none; }
 
 textarea {
 	font-family: $font--base;
-	font-size: $font-size-base;
-	line-height: $line-height-base; 
+	font-size: $font-size--base;
+	line-height: $line-height--base; 
 	line-height: inherit;
 	margin: 0;
 	overflow: auto;

@@ -53,6 +53,7 @@ module.exports = {
 			{
 				exclude: /node_modules/,
 				loader: ExtractTextPlugin.extract('css!postcss!sass'),
+				// loader: 'style!css!sass!sass-resources',
 				test: /\.scss$/
 			},
 			{
@@ -66,6 +67,8 @@ module.exports = {
 			}
 		]
 	},
+
+	sassResources: ['./src/globals/scss/variables.scss', './src/globals/scss/mixins/*.scss', './src/globals/scss/mixins.scss' ],
 
 	plugins: [
 		new ExtractTextPlugin('dist/[name].css'),
