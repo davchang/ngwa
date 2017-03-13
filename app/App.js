@@ -1,4 +1,4 @@
-require('../assets/style.scss');
+//require('../assets/style.scss');
 import React from 'react';
 import SignIn from '../src/components/sign-in';
 
